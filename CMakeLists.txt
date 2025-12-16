@@ -24,19 +24,37 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glm)
 
+FetchContent_Declare(
+    glad
+    GIT_REPOSITORY https://github.com/Dav1dde/glad.git
+    GIT_TAG        v0.1.36
+)
+
+# Konfiguracja GLAD
+set(GLAD_PROFILE "core")
+set(GLAD_API "gl=3.3")     # możesz zmienić np. na gl=3.3
+set(GLAD_GENERATOR "c")
+set(GLAD_SPEC "gl")
+
+FetchContent_MakeAvailable(glad)
 
 
 
-add_executable(VoxMine
+
+add_executable(${PROJECT_NAME}
     src/main.cpp
+    src/Shader.h
+    src/Shader.cpp
+    shaders/vertex.vs
+    shaders/fragment.fs
 )
 
 
-target_link_libraries(VoxMine
-    PRIVATE
+target_link_libraries(${PROJECT_NAME}
         OpenGL::GL
         glfw
         glm::glm
+        glad
 )
 
 # if (MSVC)
