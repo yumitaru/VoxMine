@@ -18,6 +18,13 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glfw)
 
 FetchContent_Declare(
+    stb
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+    GIT_TAG        master
+)
+FetchContent_MakeAvailable(stb)
+
+FetchContent_Declare(
     glm
     GIT_REPOSITORY https://github.com/g-truc/glm.git
     GIT_TAG        0.9.9.8
@@ -42,11 +49,17 @@ FetchContent_MakeAvailable(glad)
 
 
 add_executable(${PROJECT_NAME}
+    ${stb_SOURCE_DIR} 
     src/main.cpp
     src/Shader.h
     src/Shader.cpp
     shaders/vertex.vs
     shaders/fragment.fs
+)
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        ${stb_SOURCE_DIR}
 )
 
 
