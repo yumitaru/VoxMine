@@ -7,11 +7,11 @@
 #include "Graphics/Shader.h"
 #include "World/World.h"
 
+// ================= GLOBALS =================
+
 World world;
 
-int playerLayer = 4;
-
-Camera camera({8.f, playerLayer + 1.f, 8.f});
+Camera camera({8.f, 6.f, 8.f});
 
 float lastX = 400.f, lastY = 300.f;
 bool firstMouse = true;
@@ -19,6 +19,7 @@ float deltaTime = 0.f, lastFrame = 0.f;
 
 unsigned int cubeVAO, cubeVBO;
 
+// ================= RAYCAST =================
 
 bool raycast(World& w, glm::vec3 origin, glm::vec3 dir, glm::ivec3& hit) {
     for (float t = 0.f; t < 6.f; t += 0.1f) {
@@ -36,12 +37,15 @@ bool raycast(World& w, glm::vec3 origin, glm::vec3 dir, glm::ivec3& hit) {
     return false;
 }
 
+// ================= CALLBACKI =================
+
 void mouse_callback(GLFWwindow*, double x, double y) {
     if (firstMouse) {
         lastX = (float)x;
         lastY = (float)y;
         firstMouse = false;
     }
+
     camera.ProcessMouse((float)x - lastX, lastY - (float)y);
     lastX = (float)x;
     lastY = (float)y;
@@ -49,23 +53,31 @@ void mouse_callback(GLFWwindow*, double x, double y) {
 
 void mouse_button_callback(GLFWwindow*, int button, int action, int) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-
         glm::ivec3 hit;
-        if (!raycast(world, camera.Position, camera.Front, hit))
-            return;
-
-        world.set(hit.x, hit.y, hit.z, BlockType::Air);
-
-        int px = (int)floor(camera.Position.x);
-        int pz = (int)floor(camera.Position.z);
-
-        if (hit.x == px && hit.z == pz && hit.y == playerLayer) {
-            if (playerLayer > 0)
-                playerLayer--;
+        if (raycast(world, camera.Position, camera.Front, hit)) {
+            world.set(hit.x, hit.y, hit.z, BlockType::Air);
         }
     }
 }
 
+// ================= GRAWITACJA =================
+
+void applyGravity(float dt) {
+    glm::vec3 pos = camera.Position;
+
+    int x = (int)floor(pos.x);
+    int yBelow = (int)floor(pos.y - 1.f);
+    int z = (int)floor(pos.z);
+
+    if (world.isInside(x, yBelow, z) &&
+        world.get(x, yBelow, z) == BlockType::Air) {
+        camera.Position.y -= 5.f * dt;
+    } else {
+        camera.Position.y = floor(camera.Position.y);
+    }
+}
+
+// ================= INPUT =================
 
 void processInput(GLFWwindow* w) {
 
@@ -75,27 +87,35 @@ void processInput(GLFWwindow* w) {
     }
 
     glm::vec3 oldPos = camera.Position;
+    float v = camera.Speed * deltaTime;
+
+    glm::vec3 forward = glm::normalize(glm::vec3(
+        camera.Front.x, 0.f, camera.Front.z));
+
+    glm::vec3 right = glm::normalize(glm::cross(forward, camera.Up));
 
     if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS)
-        camera.Position += camera.Front * deltaTime * camera.Speed;
+        camera.Position += forward * v;
     if (glfwGetKey(w, GLFW_KEY_S) == GLFW_PRESS)
-        camera.Position -= camera.Front * deltaTime * camera.Speed;
-
-    glm::vec3 right = glm::normalize(glm::cross(camera.Front, camera.Up));
+        camera.Position -= forward * v;
     if (glfwGetKey(w, GLFW_KEY_A) == GLFW_PRESS)
-        camera.Position -= right * deltaTime * camera.Speed;
+        camera.Position -= right * v;
     if (glfwGetKey(w, GLFW_KEY_D) == GLFW_PRESS)
-        camera.Position += right * deltaTime * camera.Speed;
+        camera.Position += right * v;
 
     int x = (int)floor(camera.Position.x);
     int z = (int)floor(camera.Position.z);
 
+    // BLOKADA WYJŚCIA POZA MAPĘ
     if (!world.isInside(x, 0, z)) {
         camera.Position = oldPos;
+        return;
     }
 
-    camera.Position.y = (float)playerLayer + 1.f;
+    applyGravity(deltaTime);
 }
+
+// ================= MAIN =================
 
 int main() {
     glfwInit();
@@ -157,8 +177,13 @@ int main() {
             for (int y = 0; y < World::SIZE_Y; y++)
                 for (int z = 0; z < World::SIZE_Z; z++)
                     if (world.get(x, y, z) == BlockType::Solid) {
-                        glm::mat4 model = glm::translate(glm::mat4(1.f), glm::vec3(x, y, z));
+
+                        glm::mat4 model =
+                            glm::translate(glm::mat4(1.f), glm::vec3(x, y, z));
+
                         shader.setMat4("model", model);
+                        glUniform1i(glGetUniformLocation(shader.ID, "layerY"), y);
+
                         glBindVertexArray(cubeVAO);
                         glDrawArrays(GL_TRIANGLES, 0, 36);
                     }
