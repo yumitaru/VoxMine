@@ -74,16 +74,13 @@ void Application::Run() {
         glfwPollEvents();
         Input::Update();
 
-        // ================= ESC = ZAMKNIJ GRĘ =================
         if (Input::Key(GLFW_KEY_ESCAPE)) {
             glfwSetWindowShouldClose(window, true);
         }
-        // =====================================================
 
         camera.ProcessMouse(Input::MouseDX(), Input::MouseDY());
         player.Update(dt, world, camera);
 
-        // 1 klik = 1 blok
         bool mouseDown = Input::MousePressed(GLFW_MOUSE_BUTTON_LEFT);
         if (mouseDown && !mouseLeftWasDown) {
             glm::ivec3 hit;
