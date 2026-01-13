@@ -15,7 +15,7 @@ public:
 
     Camera(glm::vec3 startPos);
 
-    glm::mat4 GetViewMatrix();
-    void ProcessKeyboard(int direction, float deltaTime);
+    glm::mat4 GetViewMatrix() const;
+    void ProcessKeyboard(int dir, float dt);
     void ProcessMouse(float xoffset, float yoffset);
 };

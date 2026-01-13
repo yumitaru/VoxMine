@@ -54,6 +54,7 @@ add_executable(${PROJECT_NAME}
     src/Core/Camera.cpp
     src/Graphics/Shader.cpp
     src/World/Floor.cpp
+    src/World/World.cpp
     shaders/vertex.vs
     shaders/fragment.fs
 )

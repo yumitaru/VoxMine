@@ -2,67 +2,39 @@
 #include <glad/glad.h>
 #include <fstream>
 #include <sstream>
-#include <iostream>
 
-Shader::Shader(const char* vPath, const char* fPath) {
-    std::ifstream vFile(vPath), fFile(fPath);
+Shader::Shader(const char* vs, const char* fs) {
+    std::ifstream v(vs), f(fs);
+    std::stringstream vsr, fsr;
+    vsr << v.rdbuf();
+    fsr << f.rdbuf();
 
-    if (!vFile || !fFile) {
-        std::cout << "ERROR: Cannot open shader files:\n"
-                  << vPath << "\n" << fPath << std::endl;
-    }
+    std::string vc = vsr.str();
+    std::string fc = fsr.str();
+    const char* vsc = vc.c_str();
+    const char* fsc = fc.c_str();
 
-    std::stringstream vStream, fStream;
-    vStream << vFile.rdbuf();
-    fStream << fFile.rdbuf();
+    unsigned int vsh = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vsh, 1, &vsc, nullptr);
+    glCompileShader(vsh);
 
-    std::string vCode = vStream.str();
-    std::string fCode = fStream.str();
-
-    const char* vShaderCode = vCode.c_str();
-    const char* fShaderCode = fCode.c_str();
-
-    unsigned int vShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vShader, 1, &vShaderCode, nullptr);
-    glCompileShader(vShader);
-
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vShader, 512, NULL, infoLog);
-        std::cout << "VERTEX SHADER ERROR:\n" << infoLog << std::endl;
-    }
-
-    unsigned int fShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fShader, 1, &fShaderCode, nullptr);
-    glCompileShader(fShader);
-
-    glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fShader, 512, NULL, infoLog);
-        std::cout << "FRAGMENT SHADER ERROR:\n" << infoLog << std::endl;
-    }
+    unsigned int fsh = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fsh, 1, &fsc, nullptr);
+    glCompileShader(fsh);
 
     ID = glCreateProgram();
-    glAttachShader(ID, vShader);
-    glAttachShader(ID, fShader);
+    glAttachShader(ID, vsh);
+    glAttachShader(ID, fsh);
     glLinkProgram(ID);
 
-    glGetProgramiv(ID, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(ID, 512, NULL, infoLog);
-        std::cout << "SHADER LINK ERROR:\n" << infoLog << std::endl;
-    }
-
-    glDeleteShader(vShader);
-    glDeleteShader(fShader);
+    glDeleteShader(vsh);
+    glDeleteShader(fsh);
 }
 
-void Shader::use() {
+void Shader::use() const {
     glUseProgram(ID);
 }
 
-void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+void Shader::setMat4(const std::string& n, const glm::mat4& m) const {
+    glUniformMatrix4fv(glGetUniformLocation(ID, n.c_str()), 1, GL_FALSE, &m[0][0]);
 }
