@@ -1,10 +1,16 @@
 #include "World.h"
 
 World::World() {
-    for (int x = 0; x < SIZE_X; x++)
-        for (int y = 0; y < SIZE_Y; y++)
-            for (int z = 0; z < SIZE_Z; z++)
-                blocks[x][y][z] = (y == 0) ? BlockType::Solid : BlockType::Air;
+    for (int x = 0; x < SIZE_X; x++) {
+        for (int y = 0; y < SIZE_Y; y++) {
+            for (int z = 0; z < SIZE_Z; z++) {
+                if (y < 5)
+                    blocks[x][y][z] = BlockType::Solid;
+                else
+                    blocks[x][y][z] = BlockType::Air;
+            }
+        }
+    }
 }
 
 bool World::isInside(int x, int y, int z) const {
