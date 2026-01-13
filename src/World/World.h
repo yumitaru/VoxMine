@@ -4,7 +4,7 @@
 class World {
 public:
     static const int SIZE_X = 16;
-    static const int SIZE_Y = 4;
+    static const int SIZE_Y = 8;   // musi być >= 6
     static const int SIZE_Z = 16;
 
     BlockType blocks[SIZE_X][SIZE_Y][SIZE_Z];

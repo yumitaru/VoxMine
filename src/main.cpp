@@ -7,11 +7,17 @@
 #include "Graphics/Shader.h"
 #include "World/World.h"
 
-// ================= GLOBALS =================
+const float PLAYER_HEIGHT = 1.0f;
+const float JUMP_VELOCITY = 6.5f;
+const float GRAVITY = -20.f;
+
 
 World world;
 
-Camera camera({8.f, 6.f, 8.f});
+Camera camera({8.f, 20.f, 8.f});
+
+float velocityY = 0.f;
+bool onGround = false;
 
 float lastX = 400.f, lastY = 300.f;
 bool firstMouse = true;
@@ -19,7 +25,6 @@ float deltaTime = 0.f, lastFrame = 0.f;
 
 unsigned int cubeVAO, cubeVBO;
 
-// ================= RAYCAST =================
 
 bool raycast(World& w, glm::vec3 origin, glm::vec3 dir, glm::ivec3& hit) {
     for (float t = 0.f; t < 6.f; t += 0.1f) {
@@ -37,7 +42,6 @@ bool raycast(World& w, glm::vec3 origin, glm::vec3 dir, glm::ivec3& hit) {
     return false;
 }
 
-// ================= CALLBACKI =================
 
 void mouse_callback(GLFWwindow*, double x, double y) {
     if (firstMouse) {
@@ -60,27 +64,38 @@ void mouse_button_callback(GLFWwindow*, int button, int action, int) {
     }
 }
 
-// ================= GRAWITACJA =================
+void applyPhysicsY(float dt) {
 
-void applyGravity(float dt) {
-    glm::vec3 pos = camera.Position;
+    int x = (int)floor(camera.Position.x);
+    int z = (int)floor(camera.Position.z);
 
-    int x = (int)floor(pos.x);
-    int yBelow = (int)floor(pos.y - 1.f);
-    int z = (int)floor(pos.z);
+    float feetY = camera.Position.y - PLAYER_HEIGHT;
+    int yBlockBelow = (int)floor(feetY);
 
-    if (world.isInside(x, yBelow, z) &&
-        world.get(x, yBelow, z) == BlockType::Air) {
-        camera.Position.y -= 5.f * dt;
-    } else {
-        camera.Position.y = floor(camera.Position.y);
+    if (world.isInside(x, yBlockBelow, z) &&
+        world.get(x, yBlockBelow, z) == BlockType::Solid) {
+        camera.Position.y = (float)yBlockBelow + 2.0f;
+        velocityY = 0.f;
+        onGround = true;
+        return;
     }
+
+    onGround = false;
+    velocityY += GRAVITY * dt;
+
+    float nextY = camera.Position.y + velocityY * dt;
+
+    if (nextY < 2.0f) {
+        camera.Position.y = 2.0f;
+        velocityY = 0.f;
+        onGround = true;
+        return;
+    }
+
+    camera.Position.y = nextY;
 }
 
-// ================= INPUT =================
-
 void processInput(GLFWwindow* w) {
-
     if (glfwGetKey(w, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(w, true);
         return;
@@ -91,7 +106,6 @@ void processInput(GLFWwindow* w) {
 
     glm::vec3 forward = glm::normalize(glm::vec3(
         camera.Front.x, 0.f, camera.Front.z));
-
     glm::vec3 right = glm::normalize(glm::cross(forward, camera.Up));
 
     if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS)
@@ -103,19 +117,21 @@ void processInput(GLFWwindow* w) {
     if (glfwGetKey(w, GLFW_KEY_D) == GLFW_PRESS)
         camera.Position += right * v;
 
+    if (glfwGetKey(w, GLFW_KEY_SPACE) == GLFW_PRESS && onGround) {
+        velocityY = JUMP_VELOCITY;
+        onGround = false;
+    }
+
     int x = (int)floor(camera.Position.x);
     int z = (int)floor(camera.Position.z);
 
-    // BLOKADA WYJŚCIA POZA MAPĘ
     if (!world.isInside(x, 0, z)) {
         camera.Position = oldPos;
         return;
     }
 
-    applyGravity(deltaTime);
+    applyPhysicsY(deltaTime);
 }
-
-// ================= MAIN =================
 
 int main() {
     glfwInit();
