@@ -51,8 +51,9 @@ FetchContent_MakeAvailable(glad)
 add_executable(${PROJECT_NAME}
     ${stb_SOURCE_DIR} 
     src/main.cpp
-    src/Shader.h
-    src/Shader.cpp
+    src/Core/Camera.cpp
+    src/Graphics/Shader.cpp
+    src/World/Floor.cpp
     shaders/vertex.vs
     shaders/fragment.fs
 )
