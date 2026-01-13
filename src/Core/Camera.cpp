@@ -1,34 +1,19 @@
 #include "Camera.h"
+#include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera(glm::vec3 startPos)
-    : Position(startPos),
-      Front(0.f, 0.f, -1.f),
-      Up(0.f, 1.f, 0.f),
-      Yaw(-90.f),
-      Pitch(0.f),
-      Speed(5.f),
-      Sensitivity(0.1f) {}
+Camera::Camera(glm::vec3 pos) : Position(pos) {}
 
 glm::mat4 Camera::GetViewMatrix() const {
     return glm::lookAt(Position, Position + Front, Up);
 }
 
-void Camera::ProcessKeyboard(int dir, float dt) {
-    float v = Speed * dt;
-    glm::vec3 right = glm::normalize(glm::cross(Front, Up));
+void Camera::ProcessMouse(float dx, float dy) {
+    float sens = 0.1f;
+    dx *= sens;
+    dy *= sens;
 
-    if (dir == 0) Position += Front * v;
-    if (dir == 1) Position -= Front * v;
-    if (dir == 2) Position -= right * v;
-    if (dir == 3) Position += right * v;
-}
-
-void Camera::ProcessMouse(float xoffset, float yoffset) {
-    xoffset *= Sensitivity;
-    yoffset *= Sensitivity;
-
-    Yaw += xoffset;
-    Pitch += yoffset;
+    Yaw += dx;
+    Pitch += dy;
 
     if (Pitch > 89.f) Pitch = 89.f;
     if (Pitch < -89.f) Pitch = -89.f;

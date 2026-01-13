@@ -8,5 +8,4 @@ public:
 
     Shader(const char* vs, const char* fs);
     void use() const;
-    void setMat4(const std::string& name, const glm::mat4& m) const;
-};
+    void setMat4(const std::string& name, const glm::mat4& m) const;    void setInt(const std::string& name, int value) const;};

@@ -51,10 +51,15 @@ FetchContent_MakeAvailable(glad)
 add_executable(${PROJECT_NAME}
     ${stb_SOURCE_DIR} 
     src/main.cpp
+    src/Core/Application.cpp
     src/Core/Camera.cpp
     src/Graphics/Shader.cpp
+    src/Graphics/Renderer.cpp
+    src/Graphics/HUDRenderer.cpp
     src/World/Floor.cpp
     src/World/World.cpp
+    src/Input/Input.cpp
+    src/Player/Player.cpp
     shaders/vertex.vs
     shaders/fragment.fs
 )

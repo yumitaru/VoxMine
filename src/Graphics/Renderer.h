@@ -1,0 +1,16 @@
+#pragma once
+
+class World;
+class Camera;
+class Shader;
+
+class Renderer {
+public:
+    void Init();
+    void RenderWorld(const World& world, const Camera& camera);
+
+private:
+    Shader* shader = nullptr;
+    unsigned int vao = 0;
+    unsigned int vbo = 0;
+};
