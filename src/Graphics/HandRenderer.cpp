@@ -15,11 +15,11 @@ void HandRenderer::Init() {
     float verts[] = {
         -0.15f, -0.35f,
          0.15f, -0.35f,
-         0.20f,  0.30f,
+         0.15f,  0.35f,
 
         -0.15f, -0.35f,
-         0.20f,  0.30f,
-        -0.10f,  0.30f
+         0.15f,  0.35f,
+        -0.15f,  0.35f
     };
 
     glGenVertexArrays(1, &vao);
@@ -35,7 +35,7 @@ void HandRenderer::Init() {
 
 void HandRenderer::Update(float dt, bool mining) {
     if (mining) {
-        anim += dt * 8.f; 
+        anim += dt * 8.f;
         if (anim > 1.f) anim -= 1.f;
     } else {
         anim = 0.f;
@@ -50,25 +50,72 @@ void HandRenderer::Render() {
     float angle = swing * 0.9f;
     float bob   = std::abs(swing) * 0.08f;
 
-    glm::mat4 m(1.f);
-
-    m = glm::translate(m, glm::vec3(0.75f, -0.75f + bob, 0.f));
-
-    m = glm::rotate(m, angle, glm::vec3(0, 0, 1));
-
-    m = glm::scale(m, glm::vec3(
-        1.4f,
-        1.6f - std::abs(swing) * 0.15f,
-        1.f
-    ));
-
-    glUniformMatrix4fv(
-        glGetUniformLocation(shader->ID, "transform"),
-        1, GL_FALSE, &m[0][0]
-    );
+    glm::mat4 base(1.f);
+    base = glm::translate(base, glm::vec3(0.75f, -0.75f + bob, 0.f));
+    base = glm::rotate(base, angle, glm::vec3(0, 0, 1));
 
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // ================= TRZONEK =================
+    {
+        glm::mat4 m = base;
+        m = glm::translate(m, glm::vec3(0.0f, 0.45f, 0.f));
+        m = glm::scale(m, glm::vec3(0.22f, 1.0f, 1.f));
+
+        glUniformMatrix4fv(
+            glGetUniformLocation(shader->ID, "transform"),
+            1, GL_FALSE, &m[0][0]
+        );
+
+        glUniform3f(
+            glGetUniformLocation(shader->ID, "color"),
+            0.45f, 0.28f, 0.12f
+        );
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+
+    // ================= GŁOWA ŁOPATY =================
+    {
+        glm::mat4 m = base;
+        m = glm::translate(m, glm::vec3(0.0f, 0.80f, 0.f));
+        m = glm::scale(m, glm::vec3(0.6f, 0.30f, 1.f));
+
+        glUniformMatrix4fv(
+            glGetUniformLocation(shader->ID, "transform"),
+            1, GL_FALSE, &m[0][0]
+        );
+
+        glUniform3f(
+            glGetUniformLocation(shader->ID, "color"),
+            0.55f, 0.55f, 0.6f
+        );
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+
+    // ================= RĘKA =================
+    {
+        glm::mat4 m = base;
+        m = glm::translate(m, glm::vec3(0.0f, -0.1f, 0.f));
+        m = glm::scale(m, glm::vec3(
+            1.4f,
+            1.6f - std::abs(swing) * 0.15f,
+            1.f
+        ));
+
+        glUniformMatrix4fv(
+            glGetUniformLocation(shader->ID, "transform"),
+            1, GL_FALSE, &m[0][0]
+        );
+
+        glUniform3f(
+            glGetUniformLocation(shader->ID, "color"),
+            0.85f, 0.75f, 0.6f
+        );
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
 
     glEnable(GL_DEPTH_TEST);
 }
