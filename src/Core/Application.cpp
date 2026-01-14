@@ -8,17 +8,18 @@
 
 #include "../Input/Input.h"
 #include "../World/World.h"
-
 #include "../Player/Player.h"
 #include "../Core/Camera.h"
 #include "../Graphics/Renderer.h"
 #include "../Graphics/HUDRenderer.h"
+#include "../Graphics/HandRenderer.h"
 
 static World world;
 static Player player;
-static Camera camera({8.f, 20.f, 8.f});
+static Camera camera({8.f, 10.f, 8.f});
 static Renderer renderer;
 static HUDRenderer hud;
+static HandRenderer hand;
 
 static float lastFrame = 0.f;
 static bool mouseLeftWasDown = false;
@@ -27,10 +28,6 @@ Application::Application() {}
 Application::~Application() { Shutdown(); }
 
 void Application::Init() {
-    glfwSetErrorCallback([](int e, const char* d) {
-        std::cerr << "GLFW ERROR " << e << ": " << d << "\n";
-    });
-
     if (!glfwInit()) {
         running = false;
         return;
@@ -59,6 +56,7 @@ void Application::Init() {
     Input::Init(window);
     renderer.Init();
     hud.Init();
+    hand.Init();
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
@@ -75,25 +73,28 @@ void Application::Run() {
         glfwPollEvents();
         Input::Update();
 
-        if (Input::Key(GLFW_KEY_ESCAPE)) {
+        if (Input::Key(GLFW_KEY_ESCAPE))
             glfwSetWindowShouldClose(window, true);
-        }
 
         camera.ProcessMouse(Input::MouseDX(), Input::MouseDY());
         player.Update(dt, world, camera);
 
-        bool mouseDown = Input::MousePressed(GLFW_MOUSE_BUTTON_LEFT);
-        if (mouseDown && !mouseLeftWasDown) {
+        bool mining = Input::MousePressed(GLFW_MOUSE_BUTTON_LEFT);
+
+        if (mining && !mouseLeftWasDown) {
             glm::ivec3 hit;
             if (world.Raycast(camera.Position, camera.Front, hit)) {
                 world.set(hit.x, hit.y, hit.z, BlockType::Air);
             }
         }
-        mouseLeftWasDown = mouseDown;
+        mouseLeftWasDown = mining;
+
+        hand.Update(dt, mining);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderer.RenderWorld(world, camera);
         hud.Render();
+        hand.Render();
 
         glfwSwapBuffers(window);
     }

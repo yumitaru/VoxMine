@@ -59,9 +59,12 @@ add_executable(${PROJECT_NAME}
     src/World/Floor.cpp
     src/World/World.cpp
     src/Input/Input.cpp
+    src/Graphics/HandRenderer.cpp
     src/Player/Player.cpp
     shaders/vertex.vs
     shaders/fragment.fs
+    shaders/hand.fs
+    shaders/hand.vs
 )
 
 target_include_directories(${PROJECT_NAME}
