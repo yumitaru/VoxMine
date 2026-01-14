@@ -1,4 +1,5 @@
 #pragma once
+
 class Shader;
 
 class HandRenderer {
@@ -10,7 +11,8 @@ public:
 private:
     unsigned int vao = 0;
     unsigned int vbo = 0;
-    Shader* shader = nullptr;
+    unsigned int toolTexture = 0;
 
+    Shader* shader = nullptr;
     float anim = 0.f;
 };
