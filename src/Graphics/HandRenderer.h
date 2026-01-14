@@ -14,5 +14,6 @@ private:
     unsigned int toolTexture = 0;
 
     Shader* shader = nullptr;
+
     float anim = 0.f;
 };
