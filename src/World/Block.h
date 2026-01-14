@@ -2,5 +2,6 @@
 
 enum class BlockType {
     Air = 0,
-    Solid
+    Solid,
+    Falling   
 };

@@ -79,7 +79,8 @@ void Application::Run() {
         camera.ProcessMouse(Input::MouseDX(), Input::MouseDY());
         player.Update(dt, world, camera);
 
-        // === TOOL VISIBILITY ===
+        world.UpdateFallingBlocks(dt);
+
         bool toolVisible = !player.IsToolHidden();
         hand.SetToolVisible(toolVisible);
 

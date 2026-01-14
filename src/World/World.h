@@ -3,7 +3,8 @@
 
 enum class BlockType {
     Air = 0,
-    Solid
+    Solid,
+    Falling   
 };
 
 class World {
@@ -19,6 +20,8 @@ public:
     void set(int x,int y,int z, BlockType t);
 
     bool Raycast(glm::vec3 o, glm::vec3 d, glm::ivec3& hit) const;
+
+    void UpdateFallingBlocks(float dt);
 
 private:
     BlockType blocks[SIZE_X][SIZE_Y][SIZE_Z];

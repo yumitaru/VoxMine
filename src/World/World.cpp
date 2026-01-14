@@ -1,8 +1,8 @@
 #include "World.h"
 #include <cmath>
 #include <cstring>
+#include <cstdlib>
 
-// ================= FAST NOISE =================
 
 static inline float Hash(int x, int z) {
     int n = x * 73856093 ^ z * 19349663;
@@ -11,16 +11,14 @@ static inline float Hash(int x, int z) {
         & 0x7fffffff) / 1073741824.f;
 }
 
-// ================= WORLD =================
 
 World::World() {
-    // szybkie czyszczenie do Air
     std::memset(blocks, 0, sizeof(blocks));
 
     for (int x = 0; x < SIZE_X; x++) {
         for (int z = 0; z < SIZE_Z; z++) {
 
-            float n = Hash(x / 4, z / 4);   // TANIE
+            float n = Hash(x / 4, z / 4);
             int height = (int)(n * 2 + SIZE_Y / 2);
 
             if (height < 1) height = 1;
@@ -28,6 +26,10 @@ World::World() {
 
             for (int y = 0; y <= height; y++) {
                 blocks[x][y][z] = BlockType::Solid;
+            }
+
+            if (height + 1 < SIZE_Y && (rand() % 6 == 0)) {
+                blocks[x][height + 1][z] = BlockType::Falling;
             }
         }
     }
@@ -47,7 +49,22 @@ void World::set(int x,int y,int z, BlockType t) {
         blocks[x][y][z] = t;
 }
 
-// ================= FAST VOXEL RAYCAST (DDA) =================
+void World::UpdateFallingBlocks(float) {
+    for (int x = 0; x < SIZE_X; x++) {
+        for (int z = 0; z < SIZE_Z; z++) {
+            for (int y = 1; y < SIZE_Y; y++) {
+
+                if (blocks[x][y][z] == BlockType::Falling &&
+                    blocks[x][y - 1][z] == BlockType::Air) {
+
+                    blocks[x][y - 1][z] = BlockType::Falling;
+                    blocks[x][y][z] = BlockType::Air;
+                }
+            }
+        }
+    }
+}
+
 
 bool World::Raycast(glm::vec3 o, glm::vec3 d, glm::ivec3& hit) const {
     glm::ivec3 p = glm::floor(o);
@@ -61,7 +78,7 @@ bool World::Raycast(glm::vec3 o, glm::vec3 d, glm::ivec3& hit) const {
     next.z = ((step.z > 0 ? (p.z + 1) - o.z : o.z - p.z) * tDelta.z);
 
     for (int i = 0; i < 32; i++) {
-        if (isInside(p.x, p.y, p.z) && get(p.x,p.y,p.z) == BlockType::Solid) {
+        if (isInside(p.x, p.y, p.z) && get(p.x,p.y,p.z) != BlockType::Air) {
             hit = p;
             return true;
         }

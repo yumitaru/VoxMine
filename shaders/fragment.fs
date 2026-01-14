@@ -5,7 +5,9 @@ uniform int layerY;
 
 void main()
 {
-    if (layerY == 4)
+    if (layerY == -1)
+        FragColor = vec4(0.2, 0.8, 0.2, 1.0); 
+    else if (layerY == 4)
         FragColor = vec4(0.55, 0.27, 0.07, 1.0);
     else if (layerY == 3)
         FragColor = vec4(0.6, 0.4, 0.2, 1.0);

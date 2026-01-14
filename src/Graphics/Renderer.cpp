@@ -49,17 +49,24 @@ void Renderer::RenderWorld(const World& world, const Camera& camera) {
 
     glBindVertexArray(vao);
 
-    for (int x = 0; x < World::SIZE_X; x++)
-        for (int y = 0; y < World::SIZE_Y; y++)
-            for (int z = 0; z < World::SIZE_Z; z++)
-                if (world.get(x, y, z) == BlockType::Solid) {
+    for (int x = 0; x < World::SIZE_X; x++) {
+        for (int y = 0; y < World::SIZE_Y; y++) {
+            for (int z = 0; z < World::SIZE_Z; z++) {
 
-                    glm::mat4 model =
-                        glm::translate(glm::mat4(1.f), glm::vec3(x, y, z));
+                BlockType t = world.get(x, y, z);
+                if (t == BlockType::Air)
+                    continue;
 
-                    shader->setMat4("model", model);
-                    shader->setInt("layerY", y);
+                glm::mat4 model =
+                    glm::translate(glm::mat4(1.f), glm::vec3(x, y, z));
 
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
+                shader->setMat4("model", model);
+
+                int layer = (t == BlockType::Falling) ? -1 : y;
+                shader->setInt("layerY", layer);
+
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+        }
+    }
 }
