@@ -5,8 +5,8 @@
 
 void HUDRenderer::Init() {
     shader = new Shader(
-        "../shaders/hud.vs",
-        "../shaders/hud.fs"
+        "../../shaders/hud.vs",
+        "../../shaders/hud.fs"
     );
 
     float verts[] = {

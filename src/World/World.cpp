@@ -1,15 +1,41 @@
 #include "World.h"
 #include <cmath>
+#include <cstring>
+
+// ================= FAST NOISE =================
+
+static inline float Hash(int x, int z) {
+    int n = x * 73856093 ^ z * 19349663;
+    n = (n << 13) ^ n;
+    return 1.f - ((n * (n * n * 15731 + 789221) + 1376312589)
+        & 0x7fffffff) / 1073741824.f;
+}
+
+// ================= WORLD =================
 
 World::World() {
-    for(int x=0;x<SIZE_X;x++)
-        for(int y=0;y<SIZE_Y;y++)
-            for(int z=0;z<SIZE_Z;z++)
-                blocks[x][y][z] = (y < 4) ? BlockType::Solid : BlockType::Air;
+    // szybkie czyszczenie do Air
+    std::memset(blocks, 0, sizeof(blocks));
+
+    for (int x = 0; x < SIZE_X; x++) {
+        for (int z = 0; z < SIZE_Z; z++) {
+
+            float n = Hash(x / 4, z / 4);   // TANIE
+            int height = (int)(n * 2 + SIZE_Y / 2);
+
+            if (height < 1) height = 1;
+            if (height >= SIZE_Y) height = SIZE_Y - 1;
+
+            for (int y = 0; y <= height; y++) {
+                blocks[x][y][z] = BlockType::Solid;
+            }
+        }
+    }
 }
 
 bool World::isInside(int x,int y,int z) const {
-    return x>=0&&y>=0&&z>=0&&x<SIZE_X&&y<SIZE_Y&&z<SIZE_Z;
+    return x>=0 && y>=0 && z>=0 &&
+           x<SIZE_X && y<SIZE_Y && z<SIZE_Z;
 }
 
 BlockType World::get(int x,int y,int z) const {
@@ -17,18 +43,38 @@ BlockType World::get(int x,int y,int z) const {
 }
 
 void World::set(int x,int y,int z, BlockType t) {
-    if (isInside(x,y,z)) blocks[x][y][z]=t;
+    if (isInside(x,y,z))
+        blocks[x][y][z] = t;
 }
 
+// ================= FAST VOXEL RAYCAST (DDA) =================
+
 bool World::Raycast(glm::vec3 o, glm::vec3 d, glm::ivec3& hit) const {
-    for(float t=0;t<6;t+=0.1f) {
-        glm::vec3 p=o+d*t;
-        int x=(int)floor(p.x);
-        int y=(int)floor(p.y);
-        int z=(int)floor(p.z);
-        if(isInside(x,y,z)&&get(x,y,z)==BlockType::Solid){
-            hit={x,y,z};
+    glm::ivec3 p = glm::floor(o);
+
+    glm::vec3 step = glm::sign(d);
+    glm::vec3 tDelta = glm::abs(1.f / d);
+    glm::vec3 next;
+
+    next.x = ((step.x > 0 ? (p.x + 1) - o.x : o.x - p.x) * tDelta.x);
+    next.y = ((step.y > 0 ? (p.y + 1) - o.y : o.y - p.y) * tDelta.y);
+    next.z = ((step.z > 0 ? (p.z + 1) - o.z : o.z - p.z) * tDelta.z);
+
+    for (int i = 0; i < 32; i++) {
+        if (isInside(p.x, p.y, p.z) && get(p.x,p.y,p.z) == BlockType::Solid) {
+            hit = p;
             return true;
+        }
+
+        if (next.x < next.y && next.x < next.z) {
+            p.x += (int)step.x;
+            next.x += tDelta.x;
+        } else if (next.y < next.z) {
+            p.y += (int)step.y;
+            next.y += tDelta.y;
+        } else {
+            p.z += (int)step.z;
+            next.z += tDelta.z;
         }
     }
     return false;

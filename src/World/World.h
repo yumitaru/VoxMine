@@ -1,13 +1,16 @@
 #pragma once
 #include <glm/glm.hpp>
 
-enum class BlockType { Air, Solid };
+enum class BlockType {
+    Air = 0,
+    Solid
+};
 
 class World {
 public:
-    static constexpr int SIZE_X = 16;
-    static constexpr int SIZE_Y = 16;
-    static constexpr int SIZE_Z = 16;
+    static constexpr int SIZE_X = 64;
+    static constexpr int SIZE_Y = 8;
+    static constexpr int SIZE_Z = 64;
 
     World();
 

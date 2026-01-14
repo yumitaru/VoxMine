@@ -1,6 +1,6 @@
 #include "Renderer.h"
-
 #include "../World/World.h"
+
 #include "../Core/Camera.h"
 #include "Shader.h"
 
@@ -10,8 +10,8 @@
 
 void Renderer::Init() {
     shader = new Shader(
-        "../shaders/vertex.vs",
-        "../shaders/fragment.fs"
+        "../../shaders/vertex.vs",
+        "../../shaders/fragment.fs"
     );
 
     float cubeVertices[] = {
