@@ -6,6 +6,7 @@ class HandRenderer {
 public:
     void Init();
     void Update(float dt, bool mining);
+    void SetToolVisible(bool v);
     void Render();
 
 private:
@@ -16,4 +17,6 @@ private:
     Shader* shader = nullptr;
 
     float anim = 0.f;
+
+    bool toolVisible = true;
 };

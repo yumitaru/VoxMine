@@ -79,7 +79,12 @@ void Application::Run() {
         camera.ProcessMouse(Input::MouseDX(), Input::MouseDY());
         player.Update(dt, world, camera);
 
-        bool mining = Input::MousePressed(GLFW_MOUSE_BUTTON_LEFT);
+        // === TOOL VISIBILITY ===
+        bool toolVisible = !player.IsToolHidden();
+        hand.SetToolVisible(toolVisible);
+
+        bool mining = toolVisible &&
+                      Input::MousePressed(GLFW_MOUSE_BUTTON_LEFT);
 
         if (mining && !mouseLeftWasDown) {
             glm::ivec3 hit;

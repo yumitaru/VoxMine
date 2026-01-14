@@ -68,15 +68,18 @@ void HandRenderer::Init() {
     toolTexture = LoadTexture("textures/shovel.png");
 }
 
+void HandRenderer::SetToolVisible(bool v) {
+    toolVisible = v;
+}
+
 void HandRenderer::Update(float dt, bool mining) {
     if (mining) {
         anim += dt * 8.f;
         if (anim > 1.f) anim -= 1.f;
     } else {
-        anim = 0.f;
+        anim *= 0.9f; 
     }
 }
-
 
 void HandRenderer::Render() {
     glDisable(GL_DEPTH_TEST);
@@ -90,13 +93,12 @@ void HandRenderer::Render() {
     float bob   = std::abs(swing) * 0.05f;
 
     glm::mat4 base(1.f);
-
     base = glm::translate(base, glm::vec3(0.62f, -0.75f + bob, 0.f));
     base = glm::rotate(base, angle, glm::vec3(0, 0, 1));
 
     glBindVertexArray(vao);
 
-    {
+    if (toolVisible) {
         glm::mat4 m = base;
         m = glm::translate(m, glm::vec3(0.05f, 0.45f, 0.f));
         m = glm::rotate(m, glm::radians(-15.f), glm::vec3(0,0,1));

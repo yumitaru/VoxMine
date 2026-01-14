@@ -7,8 +7,11 @@ float Input::dx = 0;
 float Input::dy = 0;
 bool Input::firstMouse = true;
 
+float Input::scrollDY = 0.f;
+
 void Input::Init(GLFWwindow* w) {
     window = w;
+    glfwSetScrollCallback(window, ScrollCallback);
 }
 
 void Input::Update() {
@@ -38,3 +41,13 @@ bool Input::MousePressed(int button) {
 
 float Input::MouseDX() { return dx; }
 float Input::MouseDY() { return dy; }
+
+float Input::ScrollDY() {
+    float v = scrollDY;
+    scrollDY = 0.f;
+    return v;
+}
+
+void Input::ScrollCallback(GLFWwindow*, double, double yoffset) {
+    scrollDY = (float)yoffset;
+}

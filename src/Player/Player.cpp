@@ -10,10 +10,18 @@ static constexpr float GRAVITY = -20.f;
 static constexpr float STEP_HEIGHT = 1.f;
 
 void Player::Update(float dt, World& world, Camera& camera) {
+
+    float scroll = Input::ScrollDY();
+    if (scroll != 0.f) {
+        toolHidden = !toolHidden;
+    }
+
     glm::vec3 forward = glm::normalize(glm::vec3(camera.Front.x,0,camera.Front.z));
     glm::vec3 right = glm::normalize(glm::cross(forward, camera.Up));
 
-    float v = camera.Speed * dt;
+    float speed = toolHidden ? camera.Speed * 1.35f : camera.Speed;
+    float v = speed * dt;
+
     glm::vec3 np = camera.Position;
 
     if (Input::Key(GLFW_KEY_W)) np += forward * v;

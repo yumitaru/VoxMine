@@ -12,9 +12,14 @@ public:
     static float MouseDX();
     static float MouseDY();
 
+    static float ScrollDY();
+    static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+
 private:
     static GLFWwindow* window;
     static double lastX, lastY;
     static float dx, dy;
     static bool firstMouse;
+
+    static float scrollDY;
 };
