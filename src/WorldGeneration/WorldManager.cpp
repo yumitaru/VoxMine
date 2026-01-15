@@ -31,25 +31,72 @@ int WorldManager::checkRouteToTreasure()
 }
 
 void WorldManager::generateWorld(int sizeX, int sizeY, int sizeZ)
-{
-    // TODO: generate based on algorithm 
-    for(int x = 0; x < sizeX; x++)
+{ 
+    // random x and z for treasure
+    int _treasureX = gen.get() * (sizeX - 1) / 2;
+    int _treasureZ = gen.get() * (sizeZ - 1) / 2;
+
+    for(int y = 0; y < sizeY; y++)
     {
-        for(int y = 0; y < sizeY; y++)
+        for(int z = 0; z < sizeZ; z++)
         {
-            for(int z = 0; z < sizeZ; z++)
+            for(int x = 0; x < sizeX; x++)
             {
-                if(y == 0 || y == 4 || y == 2 || y == 6)
+                BlockType block = drawRandomBlock(x, y, z);
+                world.setBlock(x, y, z, block);
+
+                if(x == _treasureX && z == _treasureZ)
                 {
-                    world.setBlock(x, y, z, STONE);
-                }
-                else if(y == 5 || y == 3 || y == 1)
-                {
-                    world.setBlock(x, y, z, AIR);
-                }
-                else
-                {
+                    if(y == 0)
+                    {
+                        world.setBlock(x, y, z, TREASURE);
+                        treasureX = x;
+                        treasureY = y;
+                        treasureZ = z;
+                        continue;
+                    }
                     world.setBlock(x, y, z, DIRT);
+                    continue;
+                }
+            }
+        }
+    }
+}
+
+bool WorldManager::canPlayerStandAt(int x, int y, int z)
+{
+    if(world.getBlock(x, y, z) != AIR) return false;
+
+    if( y + 1 < world.getSizeY() && world.getBlock(x, y + 1, z) != AIR) return false;
+
+    if(y - 1 > 0 && world.getBlock(x, y - 1, z) == AIR) return false;
+
+    return true;
+}
+
+BlockType WorldManager::drawRandomBlock(int x, int y, int z)
+{
+    if(y == 0) return STONE;
+
+    if (world.getBlock(x, y - 1, z) == AIR) return DIRT;
+
+    return (BlockType)gen.get();
+}
+
+void WorldManager::generatePlayerStartLocation()
+{
+    for(int x = 0; x < world.getSizeX(); x++)
+    {
+        for(int z = 0; z < world.getSizeZ(); z++)
+        {
+            for(int y = world.getSizeY() - 1; y >= 0; y--)
+            {
+                if(canPlayerStandAt(x, y, z))
+                {
+                    playerX = x;
+                    playerY = y;
+                    playerZ = z;
+                    return;
                 }
             }
         }
@@ -60,6 +107,7 @@ WorldManager::WorldManager(int sizeX, int sizeY, int sizeZ)
     : world(sizeX, sizeY, sizeZ)
 {
     generateWorld(sizeX, sizeY, sizeZ);
+    generatePlayerStartLocation();
 }
 
 

@@ -6,8 +6,6 @@ class World
 
     int size_x, size_y, size_z;
 
-    int playerX, playerY, playerZ;
-
     public:
     
     World(){ World(2 ,2 ,2); }
