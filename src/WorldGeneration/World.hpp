@@ -20,5 +20,7 @@ class World
     BlockType destroyBlock(int x, int y, int z);
     int setBlock(int x, int y, int z, BlockType block);
 
+    void clear();
+
     int* getBlocks() {return blocks;}
 };

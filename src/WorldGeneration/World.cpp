@@ -40,3 +40,11 @@ int World::setBlock(int x, int y, int z, BlockType block)
     blocks[x*(size_y*size_z) + y*(size_z) + z] = block;
     return block;
 }
+
+void World::clear()
+{
+    for(int x=0;x<size_x;x++)
+        for(int y=0;y<size_y;y++)
+            for(int z=0;z<size_z;z++)
+                setBlock(x,y,z,AIR);
+}

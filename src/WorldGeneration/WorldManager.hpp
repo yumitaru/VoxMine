@@ -16,6 +16,8 @@ class WorldManager
     // Checks if the player can stand at the given coordinates.
     bool canPlayerStandAt(int x, int y, int z); 
 
+    bool hasStoneAbove(int x,int y,int z);
+
     // Randomly selects a block type based on probabilities.
     BlockType drawRandomBlock(int x, int y, int z);
 
