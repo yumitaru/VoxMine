@@ -9,7 +9,15 @@ static constexpr float HEIGHT = 1.f;
 static constexpr float GRAVITY = -20.f;
 static constexpr float STEP_HEIGHT = 1.f;
 
+static inline bool isSolid(BlockType b) {
+    return b == BlockType::STONE ||
+           b == BlockType::DIRT ||
+           b == BlockType::TREASURE;
+}
+
 void Player::Update(float dt, World& world, Camera& camera) {
+
+    bool steppedUp = false;
 
     float scroll = Input::ScrollDY();
     if (scroll != 0.f) {
@@ -17,7 +25,7 @@ void Player::Update(float dt, World& world, Camera& camera) {
     }
 
     glm::vec3 forward = glm::normalize(glm::vec3(camera.Front.x,0,camera.Front.z));
-    glm::vec3 right = glm::normalize(glm::cross(forward, camera.Up));
+    glm::vec3 right   = glm::normalize(glm::cross(forward, camera.Up));
 
     float speed = toolHidden ? camera.Speed * 1.35f : camera.Speed;
     float v = speed * dt;
@@ -26,80 +34,91 @@ void Player::Update(float dt, World& world, Camera& camera) {
 
     if (Input::Key(GLFW_KEY_W)) np += forward * v;
     if (Input::Key(GLFW_KEY_S)) np -= forward * v;
-    if (Input::Key(GLFW_KEY_A)) np -= right * v;
-    if (Input::Key(GLFW_KEY_D)) np += right * v;
+    if (Input::Key(GLFW_KEY_A)) np -= right   * v;
+    if (Input::Key(GLFW_KEY_D)) np += right   * v;
 
-    glm::vec3 test = camera.Position;
-    test.x = np.x;
+    // ===================== RUCH X =====================
+    {
+        glm::vec3 test = camera.Position;
+        test.x = np.x;
 
-    int tx = (int)floor(test.x);
-    int ty = (int)floor(camera.Position.y - HEIGHT);
-    int tz = (int)floor(test.z);
+        int tx = (int)floor(test.x);
+        int ty = (int)floor(camera.Position.y - HEIGHT);
+        int tz = (int)floor(test.z);
 
-    BlockType b = world.getBlock(tx, ty, tz);
+        if (world.isInside(tx,ty,tz) && isSolid(world.getBlock(tx,ty,tz))) {
 
-    if (world.isInside(tx, ty, tz) && (b == BlockType::STONE || b == BlockType::DIRT || b == BlockType::TREASURE)) {
-        int stepY = ty + 1;
-        int stepYY = ty + 2;
-        if (world.isInside(tx, stepY, tz) &&
-            world.getBlock(tx, stepY, tz) == BlockType::AIR && 
-            world.isInside(tx, stepYY, tz) &&
-            world.getBlock(tx, stepYY, tz) == BlockType::AIR) {
-            camera.Position.y += STEP_HEIGHT;
+            int stepY = ty + 1;
+
+            if ((!world.isInside(tx, stepY, tz) ||
+                 world.getBlock(tx, stepY, tz) == BlockType::AIR) &&
+                (!world.isInside(tx, stepY + 1, tz) ||
+                 world.getBlock(tx, stepY + 1, tz) == BlockType::AIR)) {
+
+                camera.Position.y = stepY + HEIGHT;
+                camera.Position.x = test.x;
+                steppedUp = true;
+            }
         }
-    } else {
-        camera.Position.x = test.x;
+        else {
+            camera.Position.x = test.x;
+        }
     }
 
-    test = camera.Position;
-    test.z = np.z;
+    // ===================== RUCH Z =====================
+    {
+        glm::vec3 test = camera.Position;
+        test.z = np.z;
 
-    tx = (int)floor(test.x);
-    ty = (int)floor(camera.Position.y - HEIGHT);
-    tz = (int)floor(test.z);
+        int tx = (int)floor(test.x);
+        int ty = (int)floor(camera.Position.y - HEIGHT);
+        int tz = (int)floor(test.z);
 
-    b = world.getBlock(tx, ty, tz);
+        if (world.isInside(tx,ty,tz) && isSolid(world.getBlock(tx,ty,tz))) {
 
-    if (world.isInside(tx, ty, tz) && (b == BlockType::STONE || b == BlockType::DIRT || b == BlockType::TREASURE)) {
-        int stepY = ty + 1;
-        int stepYY = ty + 2;
-        if (world.isInside(tx, stepY, tz) &&
-            world.getBlock(tx, stepY, tz) == BlockType::AIR && 
-            world.isInside(tx, stepYY, tz) &&
-            world.getBlock(tx, stepYY, tz) == BlockType::AIR) {
-            camera.Position.y += STEP_HEIGHT;
+            int stepY = ty + 1;
+
+            if ((!world.isInside(tx, stepY, tz) ||
+                 world.getBlock(tx, stepY, tz) == BlockType::AIR) &&
+                (!world.isInside(tx, stepY + 1, tz) ||
+                 world.getBlock(tx, stepY + 1, tz) == BlockType::AIR)) {
+
+                camera.Position.y = stepY + HEIGHT;
+                camera.Position.z = test.z;
+                steppedUp = true;
+            }
         }
-    } else {
-        camera.Position.z = test.z;
+        else {
+            camera.Position.z = test.z;
+        }
     }
 
-    velocityY += GRAVITY * dt;
-    camera.Position.y += velocityY * dt;
-
-    int x = (int)floor(camera.Position.x);
-    int y = (int)floor(camera.Position.y - HEIGHT);
-    int z = (int)floor(camera.Position.z);
-
-    b = world.getBlock(x, y, z);
-
-    if (world.isInside(x,y,z) && (b == BlockType::STONE || b == BlockType::DIRT || b == BlockType::TREASURE)) {
-        camera.Position.y = y + HEIGHT + 1.f;
-        velocityY = 0;
+    // ===================== GRAWITACJA =====================
+    if (!steppedUp) {
+        velocityY += GRAVITY * dt;
+        camera.Position.y += velocityY * dt;
+    } else {
+        velocityY = 0.f;
         onGround = true;
+    }
+
+    // ===================== KOLIZJA Z ZIEMIĄ =====================
+    if (!steppedUp) {
+        int x = (int)floor(camera.Position.x);
+        int y = (int)floor(camera.Position.y - HEIGHT);
+        int z = (int)floor(camera.Position.z);
+
+        if (world.isInside(x,y,z) && isSolid(world.getBlock(x,y,z))) {
+            camera.Position.y = y + HEIGHT + 1.f;
+            velocityY = 0;
+            onGround = true;
+        }
     }
 
     if (Input::Key(GLFW_KEY_SPACE) && onGround) {
         velocityY = 8.f;
         onGround = false;
     }
-
-    if (camera.Position.x < 0.1f) camera.Position.x = 0.1f;
-    if (camera.Position.x > world.getSizeX() - 0.1f)
-        camera.Position.x = world.getSizeX() - 0.1f;
-
-    if (camera.Position.z < 0.1f) camera.Position.z = 0.1f;
-    if (camera.Position.z > world.getSizeZ() - 0.1f)
-        camera.Position.z = world.getSizeZ() - 0.1f;
 
     if (camera.Position.y < HEIGHT) {
         camera.Position.y = HEIGHT;
@@ -121,7 +140,8 @@ bool Player::raycast(glm::vec3 o, glm::vec3 d, glm::ivec3 &hit, World& world)
     next.z = ((step.z > 0 ? (p.z + 1) - o.z : o.z - p.z) * tDelta.z);
 
     for (int i = 0; i < 32; i++) {
-        if (world.isInside(p.x, p.y, p.z) && world.getBlock(p.x,p.y,p.z) != BlockType::AIR) {
+        if (world.isInside(p.x,p.y,p.z) &&
+            world.getBlock(p.x,p.y,p.z) != BlockType::AIR) {
             hit = p;
             return true;
         }
