@@ -8,7 +8,7 @@ class Shader;
 class Renderer {
 public:
     void Init();
-    void RenderWorld(const World& world, const Camera& camera);
+    void RenderWorld(World& world, const Camera& camera);
 
 private:
     Shader* shader = nullptr;

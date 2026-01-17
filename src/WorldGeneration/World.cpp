@@ -23,6 +23,8 @@ World::~World()
     delete[] blocks;
 }
 
+
+
 BlockType World::getBlock(int x, int y, int z) const
 {
     return (BlockType)blocks[x*(size_y*size_z) + y*(size_z) + z];
@@ -41,6 +43,7 @@ int World::setBlock(int x, int y, int z, BlockType block)
     return block;
 }
 
+
 void World::clear()
 {
     for(int x=0;x<size_x;x++)
@@ -48,3 +51,11 @@ void World::clear()
             for(int z=0;z<size_z;z++)
                 setBlock(x,y,z,AIR);
 }
+
+bool World::isInside(int x, int y, int z)
+{
+        return x>=0 && y>=0 && z>=0 &&
+           x<size_x && y<size_y && z<size_z;
+}
+
+

@@ -57,7 +57,10 @@ add_executable(${PROJECT_NAME}
     src/Graphics/Renderer.cpp
     src/Graphics/HUDRenderer.cpp
     src/World/Floor.cpp
-    src/World/World.cpp
+    src/WorldGeneration/World.cpp
+    src/WorldGeneration/RandomIntGen.cpp
+    src/WorldGeneration/Block.hpp
+    src/WorldGeneration/WorldManager.cpp
     src/Input/Input.cpp
     src/Graphics/HandRenderer.cpp
     src/Player/Player.cpp

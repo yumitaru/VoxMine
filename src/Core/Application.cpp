@@ -7,14 +7,14 @@
 #include <glad/glad.h>
 
 #include "../Input/Input.h"
-#include "../World/World.h"
+#include "../WorldGeneration/WorldManager.hpp"
 #include "../Player/Player.h"
 #include "../Core/Camera.h"
 #include "../Graphics/Renderer.h"
 #include "../Graphics/HUDRenderer.h"
 #include "../Graphics/HandRenderer.h"
 
-static World world;
+static WorldManager worldManager(3, 3, 3);
 static Player player;
 static Camera camera({8.f, 10.f, 8.f});
 static Renderer renderer;
@@ -54,6 +54,7 @@ void Application::Init() {
     glClearColor(0.6f, 0.7f, 0.9f, 1.f);
 
     Input::Init(window);
+
     renderer.Init();
     hud.Init();
     hand.Init();
@@ -77,9 +78,8 @@ void Application::Run() {
             glfwSetWindowShouldClose(window, true);
 
         camera.ProcessMouse(Input::MouseDX(), Input::MouseDY());
-        player.Update(dt, world, camera);
+        player.Update(dt, worldManager.getWorld(), camera);
 
-        world.UpdateFallingBlocks(dt);
 
         bool toolVisible = !player.IsToolHidden();
         hand.SetToolVisible(toolVisible);
@@ -89,16 +89,17 @@ void Application::Run() {
 
         if (mining && !mouseLeftWasDown) {
             glm::ivec3 hit;
-            if (world.Raycast(camera.Position, camera.Front, hit)) {
-                world.set(hit.x, hit.y, hit.z, BlockType::Air);
+            if (player.raycast(camera.Position, camera.Front, hit, worldManager.getWorld())) {
+                worldManager.destroyBlockAt(hit.x, hit.y, hit.z);
             }
         }
         mouseLeftWasDown = mining;
 
+
         hand.Update(dt, mining);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderer.RenderWorld(world, camera);
+        renderer.RenderWorld(worldManager.getWorld(), camera);
         hud.Render();
         hand.Render();
 

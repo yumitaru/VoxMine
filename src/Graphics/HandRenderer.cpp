@@ -65,7 +65,7 @@ void HandRenderer::Init() {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    toolTexture = LoadTexture("textures/shovel.png");
+    toolTexture = LoadTexture("../../src/textures/shovel.png");
 }
 
 void HandRenderer::SetToolVisible(bool v) {

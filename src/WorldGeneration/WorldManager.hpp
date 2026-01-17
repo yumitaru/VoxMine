@@ -39,6 +39,7 @@ class WorldManager
     // Tries to destroy block at given coordinates. Returns -2 when out of bounds, -1 when cannot destroy block, otherwise blockType.
     int destroyBlockAt(int x, int y, int z); 
 
+
     // Checks if route to treasure exists.
     int checkRouteToTreasure();
 

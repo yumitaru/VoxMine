@@ -1,5 +1,5 @@
 #include "Renderer.h"
-#include "../World/World.h"
+#include "../WorldGeneration/WorldManager.hpp"
 
 #include "../Core/Camera.h"
 #include "Shader.h"
@@ -34,7 +34,7 @@ void Renderer::Init() {
     glEnableVertexAttribArray(0);
 }
 
-void Renderer::RenderWorld(const World& world, const Camera& camera) {
+void Renderer::RenderWorld(World& world, const Camera& camera) {
     shader->use();
 
     glm::mat4 projection = glm::perspective(
@@ -49,12 +49,12 @@ void Renderer::RenderWorld(const World& world, const Camera& camera) {
 
     glBindVertexArray(vao);
 
-    for (int x = 0; x < World::SIZE_X; x++) {
-        for (int y = 0; y < World::SIZE_Y; y++) {
-            for (int z = 0; z < World::SIZE_Z; z++) {
+    for (int x = 0; x < world.getSizeX(); x++) {
+        for (int y = 0; y < world.getSizeY(); y++) {
+            for (int z = 0; z < world.getSizeZ(); z++) {
 
-                BlockType t = world.get(x, y, z);
-                if (t == BlockType::Air)
+                BlockType t = world.getBlock(x, y, z);
+                if (t == BlockType::AIR)
                     continue;
 
                 glm::mat4 model =
@@ -62,7 +62,7 @@ void Renderer::RenderWorld(const World& world, const Camera& camera) {
 
                 shader->setMat4("model", model);
 
-                int layer = (t == BlockType::Falling) ? -1 : y;
+                int layer = (t == BlockType::STONE) ? -1 : y;
                 shader->setInt("layerY", layer);
 
                 glDrawArrays(GL_TRIANGLES, 0, 36);

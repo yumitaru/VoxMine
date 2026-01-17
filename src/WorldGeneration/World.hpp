@@ -1,4 +1,5 @@
 #include "Block.hpp"
+#include <glm/glm.hpp>
 
 class World
 {
@@ -19,6 +20,10 @@ class World
     BlockType getBlock(int x, int y, int z) const;
     BlockType destroyBlock(int x, int y, int z);
     int setBlock(int x, int y, int z, BlockType block);
+    bool isInside(int x,int y,int z);
+
+
+ 
 
     void clear();
 
