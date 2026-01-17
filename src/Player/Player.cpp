@@ -40,8 +40,11 @@ void Player::Update(float dt, World& world, Camera& camera) {
 
     if (world.isInside(tx, ty, tz) && (b == BlockType::STONE || b == BlockType::DIRT || b == BlockType::TREASURE)) {
         int stepY = ty + 1;
+        int stepYY = ty + 2;
         if (world.isInside(tx, stepY, tz) &&
-            world.getBlock(tx, stepY, tz) == BlockType::AIR) {
+            world.getBlock(tx, stepY, tz) == BlockType::AIR && 
+            world.isInside(tx, stepYY, tz) &&
+            world.getBlock(tx, stepYY, tz) == BlockType::AIR) {
             camera.Position.y += STEP_HEIGHT;
         }
     } else {
@@ -59,8 +62,11 @@ void Player::Update(float dt, World& world, Camera& camera) {
 
     if (world.isInside(tx, ty, tz) && (b == BlockType::STONE || b == BlockType::DIRT || b == BlockType::TREASURE)) {
         int stepY = ty + 1;
+        int stepYY = ty + 2;
         if (world.isInside(tx, stepY, tz) &&
-            world.getBlock(tx, stepY, tz) == BlockType::AIR) {
+            world.getBlock(tx, stepY, tz) == BlockType::AIR && 
+            world.isInside(tx, stepYY, tz) &&
+            world.getBlock(tx, stepYY, tz) == BlockType::AIR) {
             camera.Position.y += STEP_HEIGHT;
         }
     } else {
