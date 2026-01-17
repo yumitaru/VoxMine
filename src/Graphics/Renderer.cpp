@@ -14,14 +14,63 @@ void Renderer::Init() {
         "../../shaders/fragment.fs"
     );
 
-    float cubeVertices[] = {
-        0,0,1, 1,0,1, 1,1,1,  0,0,1, 1,1,1, 0,1,1,
-        1,0,0, 0,0,0, 0,1,0,  1,0,0, 0,1,0, 1,1,0,
-        0,0,0, 0,0,1, 0,1,1,  0,0,0, 0,1,1, 0,1,0,
-        1,0,1, 1,0,0, 1,1,0,  1,0,1, 1,1,0, 1,1,1,
-        0,1,1, 1,1,1, 1,1,0,  0,1,1, 1,1,0, 0,1,0,
-        0,0,0, 1,0,0, 1,0,1,  0,0,0, 1,0,1, 0,0,1
-    };
+float cubeVertices[] = {
+    // FRONT (z = 1)
+    0,0,1,  0,0,
+    1,0,1,  1,0,
+    1,1,1,  1,1,
+
+    0,0,1,  0,0,
+    1,1,1,  1,1,
+    0,1,1,  0,1,
+
+    // BACK (z = 0)
+    1,0,0,  0,0,
+    0,0,0,  1,0,
+    0,1,0,  1,1,
+
+    1,0,0,  0,0,
+    0,1,0,  1,1,
+    1,1,0,  0,1,
+
+    // LEFT (x = 0)
+    0,0,0,  0,0,
+    0,0,1,  1,0,
+    0,1,1,  1,1,
+
+    0,0,0,  0,0,
+    0,1,1,  1,1,
+    0,1,0,  0,1,
+
+    // RIGHT (x = 1)
+    1,0,1,  0,0,
+    1,0,0,  1,0,
+    1,1,0,  1,1,
+
+    1,0,1,  0,0,
+    1,1,0,  1,1,
+    1,1,1,  0,1,
+
+    // TOP (y = 1)
+    0,1,1,  0,0,
+    1,1,1,  1,0,
+    1,1,0,  1,1,
+
+    0,1,1,  0,0,
+    1,1,0,  1,1,
+    0,1,0,  0,1,
+
+    // BOTTOM (y = 0)
+    0,0,0,  0,0,
+    1,0,0,  1,0,
+    1,0,1,  1,1,
+
+    0,0,0,  0,0,
+    1,0,1,  1,1,
+    0,0,1,  0,1
+};
+
+
 
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -30,8 +79,18 @@ void Renderer::Init() {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // face UV
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                        (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+
+    this->EnableCullFace();
+
+
 }
 
 void Renderer::RenderWorld(World& world, const Camera& camera) {
@@ -50,23 +109,59 @@ void Renderer::RenderWorld(World& world, const Camera& camera) {
     glBindVertexArray(vao);
 
     for (int x = 0; x < world.getSizeX(); x++) {
-        for (int y = 0; y < world.getSizeY(); y++) {
-            for (int z = 0; z < world.getSizeZ(); z++) {
+    for (int y = 0; y < world.getSizeY(); y++) {
+        for (int z = 0; z < world.getSizeZ(); z++) {
 
-                BlockType t = world.getBlock(x, y, z);
-                if (t == BlockType::AIR)
+            BlockType t = world.getBlock(x, y, z);
+            if (t == AIR)
+                continue;
+
+            glm::mat4 model =
+                glm::translate(glm::mat4(1.f), glm::vec3(x, y, z));
+            shader->setMat4("model", model);
+
+            int layerY = 0;
+
+            switch (t)
+            {
+                case DIRT:
+                    layerY = y;
+                    break;
+
+                case STONE:
+                    layerY = -1;
+                    break;
+
+                case TREASURE:
+                    layerY = 999; // np. specjalny shader efekt
+                    break;
+
+                default:
                     continue;
-
-                glm::mat4 model =
-                    glm::translate(glm::mat4(1.f), glm::vec3(x, y, z));
-
-                shader->setMat4("model", model);
-
-                int layer = (t == BlockType::STONE) ? -1 : y;
-                shader->setInt("layerY", layer);
-
-                glDrawArrays(GL_TRIANGLES, 0, 36);
             }
+
+            shader->setInt("layerY", layerY);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
         }
     }
 }
+}
+
+void Renderer::EnableCullFace()
+{
+    glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
+}
+
+void Renderer::ToggleWireframe(bool eWireframe)
+{
+    glPolygonMode(
+        GL_FRONT_AND_BACK,
+        eWireframe ? GL_LINE : GL_FILL
+    );
+}
+
+

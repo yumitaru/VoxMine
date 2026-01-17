@@ -1,4 +1,5 @@
 #include "Input.h"
+#include "../Graphics/Renderer.h"
 
 GLFWwindow* Input::window = nullptr;
 double Input::lastX = 0;
@@ -6,6 +7,7 @@ double Input::lastY = 0;
 float Input::dx = 0;
 float Input::dy = 0;
 bool Input::firstMouse = true;
+bool Input::eWireframe = false;
 
 float Input::scrollDY = 0.f;
 
@@ -50,4 +52,14 @@ float Input::ScrollDY() {
 
 void Input::ScrollCallback(GLFWwindow*, double, double yoffset) {
     scrollDY = (float)yoffset;
+}
+
+void Input::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
+    {
+        eWireframe = !eWireframe;
+        Renderer* renderer = reinterpret_cast<Renderer*>(glfwGetWindowUserPointer(window));
+        renderer->ToggleWireframe(eWireframe);
+    }
 }

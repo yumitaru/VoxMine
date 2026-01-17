@@ -9,6 +9,8 @@ class Renderer {
 public:
     void Init();
     void RenderWorld(World& world, const Camera& camera);
+    void EnableCullFace();
+    void ToggleWireframe(bool eWireframe);
 
 private:
     Shader* shader = nullptr;

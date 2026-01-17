@@ -14,7 +14,7 @@
 #include "../Graphics/HUDRenderer.h"
 #include "../Graphics/HandRenderer.h"
 
-static WorldManager worldManager(3, 3, 3);
+static WorldManager worldManager(16, 16, 16);
 static Player player;
 static Camera camera({8.f, 10.f, 8.f});
 static Renderer renderer;
@@ -44,6 +44,9 @@ void Application::Init() {
     }
 
     glfwMakeContextCurrent(window);
+
+    glfwSetKeyCallback(window, Input::KeyCallback);
+
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         running = false;
@@ -94,7 +97,6 @@ void Application::Run() {
             }
         }
         mouseLeftWasDown = mining;
-
 
         hand.Update(dt, mining);
 

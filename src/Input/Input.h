@@ -1,6 +1,8 @@
 #pragma once
 #include <GLFW/glfw3.h>
 
+class Renderer;
+
 class Input {
 public:
     static void Init(GLFWwindow* w);
@@ -14,12 +16,14 @@ public:
 
     static float ScrollDY();
     static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+    static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 private:
     static GLFWwindow* window;
     static double lastX, lastY;
     static float dx, dy;
     static bool firstMouse;
+    static bool eWireframe;
 
     static float scrollDY;
 };
