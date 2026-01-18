@@ -7,8 +7,8 @@
 
 static constexpr float HEIGHT = 1.f;
 static constexpr float GRAVITY = -20.f;
+static constexpr float JUMP_FORCE = 8.f;
 
-// BLOKI BLOKUJĄCE
 static inline bool isSolid(BlockType b) {
     return b == BlockType::STONE ||
            b == BlockType::DIRT ||
@@ -21,10 +21,6 @@ static inline bool isPassableForPlayer(BlockType b)
 }
 
 void Player::Update(float dt, World& world, Camera& camera) {
-
-    // =====================================================
-    // ANTI-STUCK (RESPAWN W BLOKU)
-    // =====================================================
     {
         int x = (int)floor(camera.Position.x);
         int y = (int)floor(camera.Position.y - HEIGHT);
@@ -60,9 +56,12 @@ void Player::Update(float dt, World& world, Camera& camera) {
     if (Input::Key(GLFW_KEY_A)) np -= right   * v;
     if (Input::Key(GLFW_KEY_D)) np += right   * v;
 
-    // =====================================================
-    // OŚ X + KOLIZJA GŁOWY
-    // =====================================================
+    if (Input::Key(GLFW_KEY_SPACE) && onGround)
+    {
+        velocityY = JUMP_FORCE;
+        onGround = false;
+    }
+
     {
         glm::vec3 test = camera.Position;
         test.x = np.x;
@@ -85,7 +84,7 @@ void Player::Update(float dt, World& world, Camera& camera) {
 
             if (!headBlocked &&
                 (!world.isInside(footX, stepY + 1, z) ||
-                 world.getBlock(footX, stepY + 1, z) == BlockType::AIR))
+                 isPassableForPlayer(world.getBlock(footX, stepY + 1, z))))
             {
                 camera.Position.y = stepY + HEIGHT;
                 camera.Position.x = test.x;
@@ -96,9 +95,6 @@ void Player::Update(float dt, World& world, Camera& camera) {
         }
     }
 
-    // =====================================================
-    // OŚ Z + KOLIZJA GŁOWY
-    // =====================================================
     {
         glm::vec3 test = camera.Position;
         test.z = np.z;
@@ -121,7 +117,7 @@ void Player::Update(float dt, World& world, Camera& camera) {
 
             if (!headBlocked &&
                 (!world.isInside(x, stepY + 1, footZ) ||
-                 world.getBlock(x, stepY + 1, footZ) == BlockType::AIR))
+                 isPassableForPlayer(world.getBlock(x, stepY + 1, footZ))))
             {
                 camera.Position.y = stepY + HEIGHT;
                 camera.Position.z = test.z;
@@ -132,20 +128,9 @@ void Player::Update(float dt, World& world, Camera& camera) {
         }
     }
 
-    // =====================================================
-    // GRAWITACJA
-    // =====================================================
-    if (!steppedUp) {
-        velocityY += GRAVITY * dt;
-        camera.Position.y += velocityY * dt;
-    } else {
-        velocityY = 0.f;
-        onGround = true;
-    }
+    velocityY += GRAVITY * dt;
+    camera.Position.y += velocityY * dt;
 
-    // =====================================================
-    // PODŁOŻE
-    // =====================================================
     {
         int x = (int)floor(camera.Position.x);
         int y = (int)floor(camera.Position.y - HEIGHT);
@@ -153,14 +138,14 @@ void Player::Update(float dt, World& world, Camera& camera) {
 
         if (world.isInside(x,y,z) && isSolid(world.getBlock(x,y,z))) {
             camera.Position.y = y + HEIGHT + 1.f;
-            velocityY = 0;
+            velocityY = 0.f;
             onGround = true;
         }
     }
 
     if (camera.Position.y < HEIGHT) {
         camera.Position.y = HEIGHT;
-        velocityY = 0;
+        velocityY = 0.f;
         onGround = true;
     }
 }
