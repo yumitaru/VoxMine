@@ -165,8 +165,7 @@ void WorldManager::generateWorld(int sizeX, int sizeY, int sizeZ)
 
 bool WorldManager::canPlayerStandAt(int x, int y, int z)
 {
-    if(x == treasureX && y == treasureY && z == treasureZ)
-        return true;    
+    if(x == treasureX && y == treasureY && z == treasureZ) return true;    
 
     if(!isPassable(world.getBlock(x, y, z))) return false;
 

@@ -7,22 +7,45 @@
 
 static constexpr float HEIGHT = 1.f;
 static constexpr float GRAVITY = -20.f;
-static constexpr float STEP_HEIGHT = 1.f;
 
+// BLOKI BLOKUJĄCE
 static inline bool isSolid(BlockType b) {
     return b == BlockType::STONE ||
            b == BlockType::DIRT ||
            b == BlockType::TREASURE;
 }
 
+static inline bool isPassableForPlayer(BlockType b)
+{
+    return b == BlockType::AIR;
+}
+
 void Player::Update(float dt, World& world, Camera& camera) {
+
+    // =====================================================
+    // ANTI-STUCK (RESPAWN W BLOKU)
+    // =====================================================
+    {
+        int x = (int)floor(camera.Position.x);
+        int y = (int)floor(camera.Position.y - HEIGHT);
+        int z = (int)floor(camera.Position.z);
+
+        int safety = 0;
+        while (world.isInside(x,y,z) &&
+               isSolid(world.getBlock(x,y,z)) &&
+               safety < 8)
+        {
+            camera.Position.y += 1.f;
+            y = (int)floor(camera.Position.y - HEIGHT);
+            safety++;
+        }
+    }
 
     bool steppedUp = false;
 
     float scroll = Input::ScrollDY();
-    if (scroll != 0.f) {
+    if (scroll != 0.f)
         toolHidden = !toolHidden;
-    }
 
     glm::vec3 forward = glm::normalize(glm::vec3(camera.Front.x,0,camera.Front.z));
     glm::vec3 right   = glm::normalize(glm::cross(forward, camera.Up));
@@ -37,60 +60,81 @@ void Player::Update(float dt, World& world, Camera& camera) {
     if (Input::Key(GLFW_KEY_A)) np -= right   * v;
     if (Input::Key(GLFW_KEY_D)) np += right   * v;
 
+    // =====================================================
+    // OŚ X + KOLIZJA GŁOWY
+    // =====================================================
     {
         glm::vec3 test = camera.Position;
         test.x = np.x;
 
-        int tx = (int)floor(test.x);
-        int ty = (int)floor(camera.Position.y - HEIGHT);
-        int tz = (int)floor(test.z);
+        int footX = (int)floor(test.x);
+        int footY = (int)floor(camera.Position.y - HEIGHT);
+        int headY = footY + 1;
+        int z     = (int)floor(test.z);
 
-        if (world.isInside(tx,ty,tz) && isSolid(world.getBlock(tx,ty,tz))) {
+        bool footBlocked =
+            world.isInside(footX,footY,z) &&
+            !isPassableForPlayer(world.getBlock(footX,footY,z));
 
-            int stepY = ty + 1;
+        bool headBlocked =
+            world.isInside(footX,headY,z) &&
+            !isPassableForPlayer(world.getBlock(footX,headY,z));
 
-            if ((!world.isInside(tx, stepY, tz) ||
-                 world.getBlock(tx, stepY, tz) == BlockType::AIR) &&
-                (!world.isInside(tx, stepY + 1, tz) ||
-                 world.getBlock(tx, stepY + 1, tz) == BlockType::AIR)) {
+        if (footBlocked || headBlocked) {
+            int stepY = footY + 1;
 
+            if (!headBlocked &&
+                (!world.isInside(footX, stepY + 1, z) ||
+                 world.getBlock(footX, stepY + 1, z) == BlockType::AIR))
+            {
                 camera.Position.y = stepY + HEIGHT;
                 camera.Position.x = test.x;
                 steppedUp = true;
             }
-        }
-        else {
+        } else {
             camera.Position.x = test.x;
         }
     }
 
+    // =====================================================
+    // OŚ Z + KOLIZJA GŁOWY
+    // =====================================================
     {
         glm::vec3 test = camera.Position;
         test.z = np.z;
 
-        int tx = (int)floor(test.x);
-        int ty = (int)floor(camera.Position.y - HEIGHT);
-        int tz = (int)floor(test.z);
+        int footZ = (int)floor(test.z);
+        int footY = (int)floor(camera.Position.y - HEIGHT);
+        int headY = footY + 1;
+        int x     = (int)floor(test.x);
 
-        if (world.isInside(tx,ty,tz) && isSolid(world.getBlock(tx,ty,tz))) {
+        bool footBlocked =
+            world.isInside(x,footY,footZ) &&
+            !isPassableForPlayer(world.getBlock(x,footY,footZ));
 
-            int stepY = ty + 1;
+        bool headBlocked =
+            world.isInside(x,headY,footZ) &&
+            !isPassableForPlayer(world.getBlock(x,headY,footZ));
 
-            if ((!world.isInside(tx, stepY, tz) ||
-                 world.getBlock(tx, stepY, tz) == BlockType::AIR) &&
-                (!world.isInside(tx, stepY + 1, tz) ||
-                 world.getBlock(tx, stepY + 1, tz) == BlockType::AIR)) {
+        if (footBlocked || headBlocked) {
+            int stepY = footY + 1;
 
+            if (!headBlocked &&
+                (!world.isInside(x, stepY + 1, footZ) ||
+                 world.getBlock(x, stepY + 1, footZ) == BlockType::AIR))
+            {
                 camera.Position.y = stepY + HEIGHT;
                 camera.Position.z = test.z;
                 steppedUp = true;
             }
-        }
-        else {
+        } else {
             camera.Position.z = test.z;
         }
     }
 
+    // =====================================================
+    // GRAWITACJA
+    // =====================================================
     if (!steppedUp) {
         velocityY += GRAVITY * dt;
         camera.Position.y += velocityY * dt;
@@ -99,7 +143,10 @@ void Player::Update(float dt, World& world, Camera& camera) {
         onGround = true;
     }
 
-    if (!steppedUp) {
+    // =====================================================
+    // PODŁOŻE
+    // =====================================================
+    {
         int x = (int)floor(camera.Position.x);
         int y = (int)floor(camera.Position.y - HEIGHT);
         int z = (int)floor(camera.Position.z);
@@ -110,11 +157,6 @@ void Player::Update(float dt, World& world, Camera& camera) {
             onGround = true;
         }
     }
-
-    // if (Input::Key(GLFW_KEY_SPACE) && onGround) {
-    //     velocityY = 8.f;
-    //     onGround = false;
-    // }
 
     if (camera.Position.y < HEIGHT) {
         camera.Position.y = HEIGHT;

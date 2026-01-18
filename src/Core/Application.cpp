@@ -62,11 +62,11 @@ void Application::Init() {
     hud.Init();
     hand.Init();
 
-    camera.Position = glm::vec3(
-        worldManager.getPlayerX() + 0.5f,
-        worldManager.getPlayerY() + 3.0f,
-        worldManager.getPlayerZ() + 0.5f
-    );
+    // camera.Position = glm::vec3(
+    //     worldManager.getPlayerX() + 0.5f,
+    //     worldManager.getPlayerY() + 3.0f,
+    //     worldManager.getPlayerZ() + 0.5f
+    // );
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
