@@ -64,8 +64,6 @@ float cubeVertices[] = {
     0,0,1,  0,1
 };
 
-
-
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
 
@@ -76,7 +74,6 @@ float cubeVertices[] = {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // face UV
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                         (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);

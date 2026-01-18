@@ -12,6 +12,7 @@ public:
 private:
     void Init();
     void Shutdown();
+    void ResetGame();
 
     GLFWwindow* window = nullptr;
     bool running = true;

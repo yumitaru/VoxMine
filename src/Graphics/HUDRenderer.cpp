@@ -10,7 +10,6 @@ void HUDRenderer::Init()
         "../../shaders/hud.fs"
     );
 
-
     float dummyLine[4] = { 0.f, 0.f, 0.f, 0.f };
 
     glGenVertexArrays(1, &vao);

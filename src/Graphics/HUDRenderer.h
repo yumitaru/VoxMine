@@ -8,7 +8,6 @@ public:
     void Render();
     void RenderGameWon();
 
-
 private:
     void DrawLetter(float x, float y, float s, int type);
 

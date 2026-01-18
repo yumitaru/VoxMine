@@ -234,3 +234,17 @@ int WorldManager::destroyBlockAt(int x, int y, int z)
     return -1;
 }
 
+void WorldManager::Reset(int sizeX, int sizeY, int sizeZ)
+{
+    world.clear();
+
+    generateWorld(sizeX, sizeY, sizeZ); 
+    generatePlayerStartLocation();       
+
+    while (!checkRouteToTreasure())      
+    {
+        world.clear();
+        generateWorld(sizeX, sizeY, sizeZ);
+        generatePlayerStartLocation();
+    }
+}

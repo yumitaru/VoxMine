@@ -17,7 +17,8 @@ public:
     static float ScrollDY();
     static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
     static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
+    static void ResetMouse();
+    
 private:
     static GLFWwindow* window;
     static double lastX, lastY;

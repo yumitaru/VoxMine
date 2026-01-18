@@ -24,6 +24,7 @@ static HandRenderer hand;
 
 static float lastFrame = 0.f;
 static bool mouseLeftWasDown = false;
+static bool enterWasDown = false;
 
 Application::Application() {}
 Application::~Application() { Shutdown(); }
@@ -83,6 +84,15 @@ void Application::Run() {
 
         glfwPollEvents();
         Input::Update();
+
+        bool enterDown = Input::Key(GLFW_KEY_ENTER); 
+
+        if (gameWon && enterDown && !enterWasDown)
+        {
+            ResetGame();
+        }
+
+        enterWasDown = enterDown;
 
         if (Input::Key(GLFW_KEY_ESCAPE))
             glfwSetWindowShouldClose(window, true);
@@ -145,4 +155,26 @@ void Application::Run() {
 void Application::Shutdown() {
     if (window) glfwDestroyWindow(window);
     glfwTerminate();
+}
+
+void Application::ResetGame()
+{
+    gameWon = false; 
+
+    worldManager.Reset(16, 16, 16); 
+
+    camera.Position = glm::vec3(
+        worldManager.getPlayerX() + 0.5f,
+        worldManager.getPlayerY() + 1.0f,
+        worldManager.getPlayerZ() + 0.5f
+    );
+
+    camera.Yaw = -90.f;  
+    camera.Pitch = 0.f; 
+    camera.Front = glm::vec3(0, 0, -1); 
+
+    player = Player(); 
+    Input::ResetMouse();
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }

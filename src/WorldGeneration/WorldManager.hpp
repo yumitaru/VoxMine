@@ -22,7 +22,7 @@ class WorldManager
     BlockType drawRandomBlock(int x, int y, int z);
 
     void generatePlayerStartLocation();
-
+    
     public:
     
     WorldManager(int sizeX, int sizeY, int sizeZ);
@@ -45,4 +45,6 @@ class WorldManager
 
     // Returns reference to the managed world.
     World& getWorld() {return world;} 
+
+    void Reset(int sizeX, int sizeY, int sizeZ);
 };

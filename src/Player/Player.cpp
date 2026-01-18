@@ -23,7 +23,6 @@ static inline bool isPassableForPlayer(BlockType b)
 
 void Player::Update(float dt, World& world, Camera& camera)
 {
-
     {
         int x = (int)floor(camera.Position.x);
         int y = (int)floor(camera.Position.y - HEIGHT);

@@ -63,3 +63,10 @@ void Input::KeyCallback(GLFWwindow *window, int key, int scancode, int action, i
         renderer->ToggleWireframe(eWireframe);
     }
 }
+
+void Input::ResetMouse()
+{
+    firstMouse = true; 
+    dx = 0.f;
+    dy = 0.f;
+}
