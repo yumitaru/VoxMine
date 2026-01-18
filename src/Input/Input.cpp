@@ -11,12 +11,15 @@ bool Input::eWireframe = false;
 
 float Input::scrollDY = 0.f;
 
-void Input::Init(GLFWwindow* w) {
+void Input::Init(GLFWwindow* w) 
+{
     window = w;
     glfwSetScrollCallback(window, ScrollCallback);
+
 }
 
-void Input::Update() {
+void Input::Update() 
+{
     double x, y;
     glfwGetCursorPos(window, &x, &y);
 
@@ -31,27 +34,45 @@ void Input::Update() {
 
     lastX = x;
     lastY = y;
+
 }
 
-bool Input::Key(int key) {
+bool Input::Key(int key) 
+{
     return glfwGetKey(window, key) == GLFW_PRESS;
+
 }
 
-bool Input::MousePressed(int button) {
+bool Input::MousePressed(int button) 
+{
     return glfwGetMouseButton(window, button) == GLFW_PRESS;
+
 }
 
-float Input::MouseDX() { return dx; }
-float Input::MouseDY() { return dy; }
+float Input::MouseDX() 
+{ 
+    return dx; 
+    
+}
 
-float Input::ScrollDY() {
+float Input::MouseDY() 
+{ 
+    return dy;
+
+}
+
+float Input::ScrollDY() 
+{
     float v = scrollDY;
     scrollDY = 0.f;
     return v;
+
 }
 
-void Input::ScrollCallback(GLFWwindow*, double, double yoffset) {
+void Input::ScrollCallback(GLFWwindow*, double, double yoffset) 
+{
     scrollDY = (float)yoffset;
+
 }
 
 void Input::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -62,6 +83,7 @@ void Input::KeyCallback(GLFWwindow *window, int key, int scancode, int action, i
         Renderer* renderer = reinterpret_cast<Renderer*>(glfwGetWindowUserPointer(window));
         renderer->ToggleWireframe(eWireframe);
     }
+
 }
 
 void Input::ResetMouse()
@@ -69,4 +91,5 @@ void Input::ResetMouse()
     firstMouse = true; 
     dx = 0.f;
     dy = 0.f;
+    
 }

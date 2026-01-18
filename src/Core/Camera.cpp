@@ -5,6 +5,7 @@ Camera::Camera(glm::vec3 pos) : Position(pos) {}
 
 glm::mat4 Camera::GetViewMatrix() const {
     return glm::lookAt(Position, Position + Front, Up);
+    
 }
 
 void Camera::ProcessMouse(float dx, float dy) {
@@ -23,4 +24,5 @@ void Camera::ProcessMouse(float dx, float dy) {
     f.y = sin(glm::radians(Pitch));
     f.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
     Front = glm::normalize(f);
+
 }

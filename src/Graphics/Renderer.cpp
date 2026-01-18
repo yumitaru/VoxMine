@@ -80,8 +80,7 @@ float cubeVertices[] = {
 
 
     this->EnableCullFace();
-
-
+    
 }
 
 void Renderer::RenderWorld(World& world, const Camera& camera) {
@@ -100,42 +99,43 @@ void Renderer::RenderWorld(World& world, const Camera& camera) {
     glBindVertexArray(vao);
 
     for (int x = 0; x < world.getSizeX(); x++) {
-    for (int y = 0; y < world.getSizeY(); y++) {
-        for (int z = 0; z < world.getSizeZ(); z++) {
+        for (int y = 0; y < world.getSizeY(); y++) {
+            for (int z = 0; z < world.getSizeZ(); z++) {
 
-            BlockType t = world.getBlock(x, y, z);
-            if (t == AIR)
-                continue;
-
-            glm::mat4 model =
-                glm::translate(glm::mat4(1.f), glm::vec3(x, y, z));
-            shader->setMat4("model", model);
-
-            int layerY = 0;
-
-            switch (t)
-            {
-                case DIRT:
-                    layerY = y;
-                    break;
-
-                case STONE:
-                    layerY = -1;
-                    break;
-
-                case TREASURE:
-                    layerY = 999; 
-                    break;
-
-                default:
+                BlockType t = world.getBlock(x, y, z);
+                if (t == AIR)
                     continue;
-            }
 
-            shader->setInt("layerY", layerY);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+                glm::mat4 model =
+                    glm::translate(glm::mat4(1.f), glm::vec3(x, y, z));
+                shader->setMat4("model", model);
+
+                int layerY = 0;
+
+                switch (t)
+                {
+                    case DIRT:
+                        layerY = y;
+                        break;
+
+                    case STONE:
+                        layerY = -1;
+                        break;
+
+                    case TREASURE:
+                        layerY = 999; 
+                        break;
+
+                    default:
+                        continue;
+                }
+
+                shader->setInt("layerY", layerY);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
         }
     }
-}
+
 }
 
 void Renderer::EnableCullFace()
@@ -145,6 +145,7 @@ void Renderer::EnableCullFace()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
+
 }
 
 void Renderer::ToggleWireframe(bool eWireframe)
@@ -153,6 +154,7 @@ void Renderer::ToggleWireframe(bool eWireframe)
         GL_FRONT_AND_BACK,
         eWireframe ? GL_LINE : GL_FILL
     );
+
 }
 
 

@@ -14,11 +14,13 @@ static inline bool isSolid(BlockType b)
     return b == BlockType::STONE ||
            b == BlockType::DIRT ||
            b == BlockType::TREASURE;
+
 }
 
 static inline bool isPassableForPlayer(BlockType b)
 {
     return b == BlockType::AIR;
+
 }
 
 void Player::Update(float dt, World& world, Camera& camera)
@@ -61,7 +63,6 @@ void Player::Update(float dt, World& world, Camera& camera)
         velocityY = JUMP_FORCE;
         onGround = false;
     }
-
 
     {
         glm::vec3 test = camera.Position;
@@ -169,6 +170,7 @@ void Player::Update(float dt, World& world, Camera& camera)
         velocityY = 0.f;
         onGround = true;
     }
+
 }
 
 bool Player::raycast(glm::vec3 o, glm::vec3 d, glm::ivec3 &hit, World& world)
@@ -205,5 +207,7 @@ bool Player::raycast(glm::vec3 o, glm::vec3 d, glm::ivec3 &hit, World& world)
             next.z += tDelta.z;
         }
     }
+    
     return false;
+
 }

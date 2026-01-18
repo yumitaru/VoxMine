@@ -1,5 +1,4 @@
 #include "Application.h"
-
 #include <iostream>
 
 #define GLFW_INCLUDE_NONE
@@ -71,6 +70,7 @@ void Application::Init() {
     );
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 }
 
 void Application::Run() {
@@ -97,7 +97,7 @@ void Application::Run() {
         if (Input::Key(GLFW_KEY_ESCAPE))
             glfwSetWindowShouldClose(window, true);
 
-         if (!gameWon) 
+        if (!gameWon) 
         {
             camera.ProcessMouse(Input::MouseDX(), Input::MouseDY());
             player.Update(dt, worldManager.getWorld(), camera);
@@ -109,16 +109,17 @@ void Application::Run() {
         bool mining = toolVisible &&
                       Input::MousePressed(GLFW_MOUSE_BUTTON_LEFT);
 
-          if (!gameWon && mining && !mouseLeftWasDown) 
+        if (!gameWon && mining && !mouseLeftWasDown) 
         {
             glm::ivec3 hit;
-            if (player.raycast(camera.Position, camera.Front, hit, worldManager.getWorld())) {
+            if (player.raycast(camera.Position, camera.Front, hit, worldManager.getWorld())) 
+            {
                 worldManager.destroyBlockAt(hit.x, hit.y, hit.z);
             }
         }
         mouseLeftWasDown = mining;
 
-         if (!gameWon && Input::Key(GLFW_KEY_E))
+        if (!gameWon && Input::Key(GLFW_KEY_E))
         {
             glm::ivec3 hit;
             if (player.raycast(camera.Position, camera.Front, hit, worldManager.getWorld()))
@@ -138,10 +139,11 @@ void Application::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderer.RenderWorld(worldManager.getWorld(), camera);
 
-         if (gameWon) 
+        if (gameWon) 
         {
             hud.RenderGameWon();
         }
+
         else
         {
             hud.Render();
@@ -150,11 +152,13 @@ void Application::Run() {
 
         glfwSwapBuffers(window);
     }
+
 }
 
 void Application::Shutdown() {
     if (window) glfwDestroyWindow(window);
     glfwTerminate();
+
 }
 
 void Application::ResetGame()
@@ -177,4 +181,5 @@ void Application::ResetGame()
     Input::ResetMouse();
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    
 }

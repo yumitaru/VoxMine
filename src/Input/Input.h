@@ -25,6 +25,5 @@ private:
     static float dx, dy;
     static bool firstMouse;
     static bool eWireframe;
-
     static float scrollDY;
 };

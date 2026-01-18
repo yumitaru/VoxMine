@@ -10,14 +10,19 @@ void HUDRenderer::Init()
         "../../shaders/hud.fs"
     );
 
-    float dummyLine[4] = { 0.f, 0.f, 0.f, 0.f };
+    float dummyLine[8] = { 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f };
 
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(dummyLine), dummyLine, GL_DYNAMIC_DRAW);
+     glBufferData(
+        GL_ARRAY_BUFFER,
+        sizeof(float) * 12,
+        nullptr,
+        GL_DYNAMIC_DRAW
+    ); 
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -41,26 +46,49 @@ void HUDRenderer::Init()
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    
+}
+
+static void DrawQuad(GLuint vbo, float x, float y, float w, float h)
+{
+    float verts[] = {
+        x - w, y - h,
+        x + w, y - h,
+        x + w, y + h,
+
+        x - w, y - h,
+        x + w, y + h,
+        x - w, y + h
+    };
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), verts);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
 }
 
 void HUDRenderer::Render()
 {
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE); 
 
     shader->use();
-    glUniform3f(glGetUniformLocation(shader->ID, "color"), 1.f, 1.f, 1.f);
+    glUniform3f(
+        glGetUniformLocation(shader->ID, "color"),
+        1.f, 1.f, 1.f
+    );
 
     glBindVertexArray(vao);
 
-    float cross[] = {
-        -0.02f,  0.0f,   0.02f,  0.0f,
-         0.0f,  -0.02f,  0.0f,   0.02f
-    };
+    float size = 0.015f;
+    float thick = 0.003f;
 
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(cross), cross);
-    glDrawArrays(GL_LINES, 0, 4);
+    DrawQuad(vbo, 0.f, 0.f, size, thick); 
+
+    DrawQuad(vbo, 0.f, 0.f, thick, size);
 
     glEnable(GL_DEPTH_TEST);
+
 }
 
 static void DrawSegment(GLuint vbo, float x1, float y1, float x2, float y2)
@@ -69,6 +97,7 @@ static void DrawSegment(GLuint vbo, float x1, float y1, float x2, float y2)
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), verts);
     glDrawArrays(GL_LINES, 0, 2);
+
 }
 
 void HUDRenderer::DrawLetter(float x, float y, float s, int type)
@@ -121,6 +150,7 @@ void HUDRenderer::DrawLetter(float x, float y, float s, int type)
             DrawSegment(vbo, x + w, y - h, x + w, y);
             break;
     }
+
 }
 
 void HUDRenderer::RenderGameWon()
@@ -148,4 +178,5 @@ void HUDRenderer::RenderGameWon()
     DrawLetter(x + d * 6, y, s, 4); 
 
     glEnable(GL_DEPTH_TEST);
+
 }

@@ -43,11 +43,13 @@ void HandRenderer::Init()
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    
 }
 
 void HandRenderer::SetToolVisible(bool v)
 {
     toolVisible = v;
+
 }
 
 void HandRenderer::Update(float dt, bool mining)
@@ -58,19 +60,20 @@ void HandRenderer::Update(float dt, bool mining)
     } else {
         anim *= 0.9f;
     }
+
 }
 
-void HandRenderer::DrawCube(const glm::mat4& model, int mode,
-                            const glm::mat4& view,
-                            const glm::mat4& proj)
+void HandRenderer::DrawCube(const glm::mat4& model, int mode, const glm::mat4& view,const glm::mat4& proj)
 {
     glm::mat4 mvp = proj * view * model;
     glUniformMatrix4fv(
         glGetUniformLocation(shader->ID, "MVP"),
         1, GL_FALSE, &mvp[0][0]
     );
+
     glUniform1i(glGetUniformLocation(shader->ID, "mode"), mode);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+
 }
 
 void HandRenderer::Render()
@@ -89,7 +92,6 @@ void HandRenderer::Render()
         glm::radians(60.f), 16.f / 9.f, 0.01f, 10.f
     );
     glm::mat4 view = glm::translate(glm::mat4(1.f), glm::vec3(0, 0, -1.2f));
-
 
     glm::mat4 base(1.f);
 
@@ -121,4 +123,5 @@ void HandRenderer::Render()
 
     DrawCube(hand, 0, view, proj);
     glEnable(GL_DEPTH_TEST);
+
 }
