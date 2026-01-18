@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 class Shader;
 
 class HandRenderer {
@@ -7,6 +9,9 @@ public:
     void Init();
     void Update(float dt, bool mining);
     void SetToolVisible(bool v);
+    void DrawCube(const glm::mat4& model, int mode,
+                            const glm::mat4& view,
+                            const glm::mat4& proj);
     void Render();
 
 private:
