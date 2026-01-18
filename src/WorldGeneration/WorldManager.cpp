@@ -132,9 +132,8 @@ int WorldManager::checkRouteToTreasure()
 
 void WorldManager::generateWorld(int sizeX, int sizeY, int sizeZ)
 { 
-    // 'random' x and z for treasure
-    int _treasureX = gen.get() * (sizeX - 1) / 2;
-    int _treasureZ = gen.get() * (sizeZ - 1) / 2;
+    int _treasureX = std::rand() % world.getSizeX();
+    int _treasureZ = std::rand() % world.getSizeZ();
 
     for(int y = 0; y < sizeY; y++)
     {
@@ -187,20 +186,19 @@ BlockType WorldManager::drawRandomBlock(int x, int y, int z)
 
 void WorldManager::generatePlayerStartLocation()
 {
-    for(int x = 0; x < world.getSizeX(); x++)
+    int y = world.getSizeY() - 1;
+
+    while (true)
     {
-        for(int z = 0; z < world.getSizeZ(); z++)
+        int x = std::rand() % world.getSizeX();
+        int z = std::rand() % world.getSizeZ();
+
+        if (canPlayerStandAt(x, y, z))
         {
-            for(int y = world.getSizeY() - 1; y >= 0; y--)
-            {
-                if(canPlayerStandAt(x, y, z))
-                {
-                    playerX = x;
-                    playerY = y;
-                    playerZ = z;
-                    return;
-                }
-            }
+            playerX = x;
+            playerY = y;
+            playerZ = z;
+            return;
         }
     }
 }
