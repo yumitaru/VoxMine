@@ -37,7 +37,6 @@ void Player::Update(float dt, World& world, Camera& camera) {
     if (Input::Key(GLFW_KEY_A)) np -= right   * v;
     if (Input::Key(GLFW_KEY_D)) np += right   * v;
 
-    // ===================== RUCH X =====================
     {
         glm::vec3 test = camera.Position;
         test.x = np.x;
@@ -65,7 +64,6 @@ void Player::Update(float dt, World& world, Camera& camera) {
         }
     }
 
-    // ===================== RUCH Z =====================
     {
         glm::vec3 test = camera.Position;
         test.z = np.z;
@@ -93,7 +91,6 @@ void Player::Update(float dt, World& world, Camera& camera) {
         }
     }
 
-    // ===================== GRAWITACJA =====================
     if (!steppedUp) {
         velocityY += GRAVITY * dt;
         camera.Position.y += velocityY * dt;
@@ -102,7 +99,6 @@ void Player::Update(float dt, World& world, Camera& camera) {
         onGround = true;
     }
 
-    // ===================== KOLIZJA Z ZIEMIĄ =====================
     if (!steppedUp) {
         int x = (int)floor(camera.Position.x);
         int y = (int)floor(camera.Position.y - HEIGHT);
@@ -115,10 +111,10 @@ void Player::Update(float dt, World& world, Camera& camera) {
         }
     }
 
-    if (Input::Key(GLFW_KEY_SPACE) && onGround) {
-        velocityY = 8.f;
-        onGround = false;
-    }
+    // if (Input::Key(GLFW_KEY_SPACE) && onGround) {
+    //     velocityY = 8.f;
+    //     onGround = false;
+    // }
 
     if (camera.Position.y < HEIGHT) {
         camera.Position.y = HEIGHT;
