@@ -3,7 +3,6 @@
 #include <vector>
 #include <functional>
 
-
 void WorldManager::updateFallingBlocks(int _x, int _y, int _z)
 {
     for(int y = 1; y < world.getSizeY(); y++)
@@ -108,7 +107,6 @@ int WorldManager::checkRouteToTreasure()
 
             if(ny < 1 || ny >= H)
                 continue;
-
 
             if(!canPlayerStandAt(nx,ny,nz)) continue;
             if(closed[nx][ny][nz]) continue;

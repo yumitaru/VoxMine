@@ -13,24 +13,23 @@ void HandRenderer::Init()
         "../../shaders/hand.fs"
     );
 
-    // Sześcian (36 vertexów)
     float verts[] = {
-        // front
+
         -0.5f,-0.5f, 0.5f,  0.5f,-0.5f, 0.5f,  0.5f, 0.5f, 0.5f,
         -0.5f,-0.5f, 0.5f,  0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
-        // back
+   
         -0.5f,-0.5f,-0.5f, -0.5f, 0.5f,-0.5f,  0.5f, 0.5f,-0.5f,
         -0.5f,-0.5f,-0.5f,  0.5f, 0.5f,-0.5f,  0.5f,-0.5f,-0.5f,
-        // left
+  
         -0.5f,-0.5f,-0.5f, -0.5f,-0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
         -0.5f,-0.5f,-0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f,-0.5f,
-        // right
+     
          0.5f,-0.5f,-0.5f,  0.5f, 0.5f,-0.5f,  0.5f, 0.5f, 0.5f,
          0.5f,-0.5f,-0.5f,  0.5f, 0.5f, 0.5f,  0.5f,-0.5f, 0.5f,
-        // top
+     
         -0.5f, 0.5f,-0.5f, -0.5f, 0.5f, 0.5f,  0.5f, 0.5f, 0.5f,
         -0.5f, 0.5f,-0.5f,  0.5f, 0.5f, 0.5f,  0.5f, 0.5f,-0.5f,
-        // bottom
+    
         -0.5f,-0.5f,-0.5f,  0.5f,-0.5f,-0.5f,  0.5f,-0.5f, 0.5f,
         -0.5f,-0.5f,-0.5f,  0.5f,-0.5f, 0.5f, -0.5f,-0.5f, 0.5f
     };
@@ -83,46 +82,43 @@ void HandRenderer::Render()
     glBindVertexArray(vao);
 
     float swing = std::sin(anim * 3.14159f);
-    float angle = swing * 0.6f;
+    float angle = swing * 0.35f;
     float bob   = std::abs(swing) * 0.05f;
 
     glm::mat4 proj = glm::perspective(
         glm::radians(60.f), 16.f / 9.f, 0.01f, 10.f
     );
-    glm::mat4 view = glm::translate(glm::mat4(1.f), glm::vec3(0, 0, -2.5f));
+    glm::mat4 view = glm::translate(glm::mat4(1.f), glm::vec3(0, 0, -1.2f));
+
 
     glm::mat4 base(1.f);
-    base = glm::translate(base, glm::vec3(0.9f, -0.9f + bob, 0.f));
+
+    base = glm::translate(base, glm::vec3(0.6f, -0.6f + bob, 0.f));
+
     base = glm::rotate(base, angle, glm::vec3(0, 0, 1));
 
-    // =========================
-    // ŁOPATA 3D
-    // =========================
     if (toolVisible)
     {
-        // Trzonek
         glm::mat4 stick = base;
         stick = glm::translate(stick, glm::vec3(0.f, 0.25f, 0.f));
         stick = glm::rotate(stick, glm::radians(-45.f), glm::vec3(0, 0, 1));
-        stick = glm::scale(stick, glm::vec3(0.07f, 0.8f, 0.07f));
-        
+        stick = glm::scale(stick, glm::vec3(0.12f, 0.9f, 0.12f));
+
+
         DrawCube(stick, 1, view, proj);
 
-        // Głowica
         glm::mat4 head = base;
         head = glm::translate(head, glm::vec3(0.3f, 0.5f, 0.f));
         head = glm::rotate(head, glm::radians(-45.f), glm::vec3(0, 0, 1));
-        head = glm::scale(head, glm::vec3(0.35f, 0.25f, 0.15f));
+        head = glm::scale(head, glm::vec3(0.45f, 0.35f, 0.25f));
         
         DrawCube(head, 2, view, proj);
     }
 
-    // =========================
-    // RĘKA
-    // =========================
     glm::mat4 hand = base;
     hand = glm::translate(hand, glm::vec3(-0.15f, -0.2f, 0.f));
-    hand = glm::scale(hand, glm::vec3(0.18f, 0.5f, 0.18f));
+    hand = glm::scale(hand, glm::vec3(0.28f, 0.7f, 0.28f));
+
     DrawCube(hand, 0, view, proj);
     glEnable(GL_DEPTH_TEST);
 }

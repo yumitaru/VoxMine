@@ -22,9 +22,6 @@ class World
     int setBlock(int x, int y, int z, BlockType block);
     bool isInside(int x,int y,int z);
 
-
- 
-
     void clear();
 
     int* getBlocks() {return blocks;}

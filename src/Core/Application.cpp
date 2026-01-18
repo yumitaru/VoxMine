@@ -87,9 +87,11 @@ void Application::Run() {
         if (Input::Key(GLFW_KEY_ESCAPE))
             glfwSetWindowShouldClose(window, true);
 
-        camera.ProcessMouse(Input::MouseDX(), Input::MouseDY());
-        player.Update(dt, worldManager.getWorld(), camera);
-
+         if (!gameWon) 
+        {
+            camera.ProcessMouse(Input::MouseDX(), Input::MouseDY());
+            player.Update(dt, worldManager.getWorld(), camera);
+        }
 
         bool toolVisible = !player.IsToolHidden();
         hand.SetToolVisible(toolVisible);
@@ -97,7 +99,8 @@ void Application::Run() {
         bool mining = toolVisible &&
                       Input::MousePressed(GLFW_MOUSE_BUTTON_LEFT);
 
-        if (mining && !mouseLeftWasDown) {
+          if (!gameWon && mining && !mouseLeftWasDown) 
+        {
             glm::ivec3 hit;
             if (player.raycast(camera.Position, camera.Front, hit, worldManager.getWorld())) {
                 worldManager.destroyBlockAt(hit.x, hit.y, hit.z);
@@ -105,12 +108,35 @@ void Application::Run() {
         }
         mouseLeftWasDown = mining;
 
+         if (!gameWon && Input::Key(GLFW_KEY_E))
+        {
+            glm::ivec3 hit;
+            if (player.raycast(camera.Position, camera.Front, hit, worldManager.getWorld()))
+            {
+                if (worldManager.getWorld().getBlock(hit.x, hit.y, hit.z) == TREASURE)
+                {
+                    gameWon = true; 
+                    std::cout << "WYGRANA!\n";
+
+                    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); 
+                }
+            }
+        }
+
         hand.Update(dt, mining);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderer.RenderWorld(worldManager.getWorld(), camera);
-        hud.Render();
-        hand.Render();
+
+         if (gameWon) 
+        {
+            hud.RenderGameWon();
+        }
+        else
+        {
+            hud.Render();
+            hand.Render();
+        }
 
         glfwSwapBuffers(window);
     }

@@ -23,8 +23,6 @@ World::~World()
     delete[] blocks;
 }
 
-
-
 BlockType World::getBlock(int x, int y, int z) const
 {
     return (BlockType)blocks[x*(size_y*size_z) + y*(size_z) + z];
@@ -42,7 +40,6 @@ int World::setBlock(int x, int y, int z, BlockType block)
     blocks[x*(size_y*size_z) + y*(size_z) + z] = block;
     return block;
 }
-
 
 void World::clear()
 {

@@ -15,4 +15,6 @@ private:
 
     GLFWwindow* window = nullptr;
     bool running = true;
+
+    bool gameWon = false;
 };

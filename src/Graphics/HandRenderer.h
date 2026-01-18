@@ -13,6 +13,7 @@ public:
                             const glm::mat4& view,
                             const glm::mat4& proj);
     void Render();
+    void DrawLetter(float x, float y, float s, int type);
 
 private:
     unsigned int vao = 0;

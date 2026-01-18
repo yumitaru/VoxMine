@@ -127,7 +127,7 @@ void Renderer::RenderWorld(World& world, const Camera& camera) {
                     break;
 
                 case TREASURE:
-                    layerY = 999; // np. specjalny shader efekt
+                    layerY = 999; 
                     break;
 
                 default:
