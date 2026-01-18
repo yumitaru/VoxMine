@@ -16,7 +16,8 @@
 
 static WorldManager worldManager(16, 16, 16);
 static Player player;
-static Camera camera({8.f, 10.f, 8.f});
+static Camera camera({0.f, 0.f, 0.f});
+
 static Renderer renderer;
 static HUDRenderer hud;
 static HandRenderer hand;
@@ -62,11 +63,11 @@ void Application::Init() {
     hud.Init();
     hand.Init();
 
-    // camera.Position = glm::vec3(
-    //     worldManager.getPlayerX() + 0.5f,
-    //     worldManager.getPlayerY() + 3.0f,
-    //     worldManager.getPlayerZ() + 0.5f
-    // );
+    camera.Position = glm::vec3(
+        worldManager.getPlayerX() + 0.5f,
+        worldManager.getPlayerY() + 1.0f,
+        worldManager.getPlayerZ() + 0.5f
+    );
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
