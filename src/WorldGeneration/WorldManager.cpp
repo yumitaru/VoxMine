@@ -3,28 +3,72 @@
 #include <vector>
 #include <functional>
 
-void WorldManager::updateFallingBlocks(int _x, int _y, int _z)
+void WorldManager::updateFallingBlocks(int x, int y, int z)
 {
-    for(int y = 1; y < world.getSizeY(); y++)
+    for(int yy = y + 1; yy < world.getSizeY(); yy++)
     {
-        if(world.getBlock(_x, y, _z) == STONE)
+        if(world.getBlock(x, yy, z) == STONE)
         {
-            int check_y = y - 1;
-            while(check_y >= 0)
-            {
-                if(world.getBlock(_x, check_y, _z) == AIR)
+            int target = yy - 1;
+            while (target >= 0 &&
+                world.getBlock(x, target, z) == AIR &&
+                !isReservedByFallingBlock(x, target, z))
                 {
-                    check_y--;
+                    target--;
                 }
-                else break;
-            }
-            if(check_y != y - 1)
+
+            target++;
+
+            if(target != yy)
             {
-                world.setBlock(_x, check_y + 1, _z, STONE);
-                world.setBlock(_x, y, _z, AIR);
+                world.setBlock(x, yy, z, AIR);
+
+                fallingBlocks.push_back({
+                    x,
+                    z,
+                    (float)yy,
+                    target,
+                    0.0f
+                });
             }
         }
     }
+}
+
+void WorldManager::updateFallingAnimation(float dt)
+{
+    const float gravity = 20.0f;
+
+    for (auto it = fallingBlocks.begin(); it != fallingBlocks.end(); )
+    {
+        it->velocity += gravity * dt;
+        it->y -= it->velocity * dt;
+
+        if (it->y <= it->targetY)
+        {
+            world.setBlock(it->x, it->targetY, it->z, STONE);
+            it = fallingBlocks.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
+bool WorldManager::isReservedByFallingBlock(int x, int y, int z) const
+{
+    for (const auto& b : fallingBlocks)
+    {
+        if (b.x == x && b.z == z && b.targetY == y)
+            return true;
+    }
+    return false;
+}
+
+const std::vector<FallingBlock> &WorldManager::getFallingBlocks() const
+{
+    return fallingBlocks;
 }
 
 bool isPassable(BlockType b)

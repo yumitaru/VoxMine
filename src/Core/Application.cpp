@@ -134,10 +134,16 @@ void Application::Run() {
             }
         }
 
+        worldManager.updateFallingAnimation(dt);
+
+        
+        
+
         hand.Update(dt, mining);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderer.RenderWorld(worldManager.getWorld(), camera);
+        renderer.RenderFallingBlocks(worldManager.getFallingBlocks(), camera);
 
         if (gameWon) 
         {

@@ -157,4 +157,35 @@ void Renderer::ToggleWireframe(bool eWireframe)
 
 }
 
+void Renderer::RenderFallingBlocks(const std::vector<FallingBlock>& blocks, const Camera& camera)
+{
+    shader->use();
 
+    glm::mat4 projection = glm::perspective(
+        glm::radians(60.f),
+        1280.f / 720.f,
+        0.1f,
+        100.f
+    );
+
+    shader->setMat4("projection", projection);
+    shader->setMat4("view", camera.GetViewMatrix());
+
+    glBindVertexArray(vao);
+
+    for (const auto& b : blocks)
+    {
+        glm::mat4 model = glm::translate(
+            glm::mat4(1.f),
+            glm::vec3(
+                (float)b.x,
+                b.y,
+                (float)b.z
+            )
+        );
+
+        shader->setMat4("model", model);
+        shader->setInt("layerY", -1); // STONE
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+}

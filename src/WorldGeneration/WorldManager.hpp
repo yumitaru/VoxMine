@@ -1,15 +1,20 @@
 #include "World.hpp"
 #include "RandomIntGen.hpp"
+#include "FallingBlock.hpp"
 
 class WorldManager
 {
     World world;
     RandomIntGen gen;
 
+    std::vector<FallingBlock> fallingBlocks;
+
     int playerX, playerY, playerZ;
     int treasureX, treasureY, treasureZ;
 
     void updateFallingBlocks(int _x, int _y, int _z);
+
+
 
     void generateWorld(int sizeX, int sizeY, int sizeZ);
 
@@ -24,6 +29,12 @@ class WorldManager
     void generatePlayerStartLocation();
     
     public:
+
+    void updateFallingAnimation(float dt);
+
+    bool isReservedByFallingBlock(int x, int y, int z) const;
+
+    const std::vector<FallingBlock>& getFallingBlocks() const;
     
     WorldManager(int sizeX, int sizeY, int sizeZ);
     ~WorldManager();
