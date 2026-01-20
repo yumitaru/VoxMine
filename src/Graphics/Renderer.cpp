@@ -7,12 +7,60 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+static unsigned int LoadTexture(const char* path)
+{
+    int width, height, channels;
+
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load(path, &width, &height, &channels, 4);
+
+    if (!data)
+    {
+        std::cout << "FAILED TO LOAD TEXTURE: " << path << std::endl;
+        return 0;
+    }
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RGBA,
+        width,
+        height,
+        0,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        data
+    );
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    stbi_image_free(data);
+
+    return texture;
+}
+
 
 void Renderer::Init() {
     shader = new Shader(
         "../../shaders/vertex.vs",
         "../../shaders/fragment.fs"
     );
+    stoneTex = LoadTexture("./Textures/stone.png");
+    mossTex  = LoadTexture("./Textures/moss.png");
 
 float cubeVertices[] = {
     0,0,1,  0,0,1,  0,0,
@@ -104,6 +152,14 @@ float cubeVertices[] = {
 
 void Renderer::RenderWorld(World& world, const Camera& camera) {
     shader->use();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, stoneTex);
+    shader->setInt("texStone", 0);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, mossTex);
+    shader->setInt("texMoss", 1);
 
     glm::mat4 projection = glm::perspective(
         glm::radians(60.f),

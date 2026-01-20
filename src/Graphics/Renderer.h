@@ -22,5 +22,6 @@ private:
     unsigned int vao = 0;
     unsigned int vbo = 0;
 
-    
+    unsigned int stoneTex = 0;
+    unsigned int mossTex  = 0;
 };

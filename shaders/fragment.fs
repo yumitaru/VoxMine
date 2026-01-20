@@ -10,6 +10,9 @@ uniform vec3 ambientColor;
 
 uniform int layerY;
 
+uniform sampler2D texStone; 
+uniform sampler2D texMoss;    
+
 /* ================= EDGE ================= */
 float edgeFactorQuad(vec2 uv)
 {
@@ -24,14 +27,25 @@ void main()
 {
     vec3 baseColor;
 
-    if (layerY == -1)
-        baseColor = vec3(0.5);
-    else if (layerY == 999)
+    if (layerY == 999)
+    {
         baseColor = vec3(1.0, 0.984, 0.0);
+    }
     else if (layerY >= 1 && layerY <= 16)
+    {
         baseColor = vec3(0.2, 1.0, 0.2);
+    }
     else
-        baseColor = vec3(0.55, 0.27, 0.07);
+    {
+        // STONE + MOSS
+        vec3 stone = texture(texStone, vFaceUV).rgb;
+        vec3 moss  = texture(texMoss,  vFaceUV).rgb;
+
+        float mossFactor = clamp(normalize(vNormal).y, 0.0, 1.0);
+        baseColor = mix(stone, moss, mossFactor);
+    }
+
+        // baseColor = vec3(0.55, 0.27, 0.07);
 
     vec3 N = normalize(vNormal);
     vec3 L = normalize(-lightDir);
