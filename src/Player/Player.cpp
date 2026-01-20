@@ -173,7 +173,7 @@ void Player::Update(float dt, World& world, Camera& camera)
 
 }
 
-bool Player::raycast(glm::vec3 o, glm::vec3 d, glm::ivec3 &hit, World& world)
+bool Player::raycast(glm::vec3 o, glm::vec3 d, glm::ivec3 &hit, World& world, float maxDistance)
 {
     glm::ivec3 p = glm::floor(o);
 
@@ -185,7 +185,9 @@ bool Player::raycast(glm::vec3 o, glm::vec3 d, glm::ivec3 &hit, World& world)
     next.y = ((step.y > 0 ? (p.y + 1) - o.y : o.y - p.y) * tDelta.y);
     next.z = ((step.z > 0 ? (p.z + 1) - o.z : o.z - p.z) * tDelta.z);
 
-    for (int i = 0; i < 32; i++)
+    float traveled = 0.0f; 
+
+    while (traveled <= maxDistance) // limit raycast disctance (no limit = for (int i = 0; i < 32; i++))
     {
         if (world.isInside(p.x,p.y,p.z) &&
             world.getBlock(p.x,p.y,p.z) != BlockType::AIR)
@@ -196,14 +198,17 @@ bool Player::raycast(glm::vec3 o, glm::vec3 d, glm::ivec3 &hit, World& world)
 
         if (next.x < next.y && next.x < next.z) {
             p.x += (int)step.x;
+            traveled = next.x;   
             next.x += tDelta.x;
         }
         else if (next.y < next.z) {
             p.y += (int)step.y;
+            traveled = next.y; 
             next.y += tDelta.y;
         }
         else {
             p.z += (int)step.z;
+            traveled = next.z;  // 
             next.z += tDelta.z;
         }
     }

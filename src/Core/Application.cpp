@@ -112,7 +112,7 @@ void Application::Run() {
         if (!gameWon && mining && !mouseLeftWasDown) 
         {
             glm::ivec3 hit;
-            if (player.raycast(camera.Position, camera.Front, hit, worldManager.getWorld())) 
+            if (player.raycast(camera.Position, camera.Front, hit, worldManager.getWorld(), 5.0f)) 
             {
                 worldManager.destroyBlockAt(hit.x, hit.y, hit.z);
             }
@@ -122,7 +122,7 @@ void Application::Run() {
         if (!gameWon && Input::Key(GLFW_KEY_E))
         {
             glm::ivec3 hit;
-            if (player.raycast(camera.Position, camera.Front, hit, worldManager.getWorld()))
+            if (player.raycast(camera.Position, camera.Front, hit, worldManager.getWorld(), 5.0f))
             {
                 if (worldManager.getWorld().getBlock(hit.x, hit.y, hit.z) == TREASURE)
                 {
