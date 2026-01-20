@@ -64,20 +64,25 @@ Shader::Shader(const char* vs, const char* fs) {
 
     glDeleteShader(vsh);
     glDeleteShader(fsh);
-
 }
 
 void Shader::use() const {
     glUseProgram(ID);
-
 }
 
 void Shader::setMat4(const std::string& n, const glm::mat4& m) const {
-    glUniformMatrix4fv(glGetUniformLocation(ID, n.c_str()), 1, GL_FALSE, &m[0][0]);
-
+    glUniformMatrix4fv(
+        glGetUniformLocation(ID, n.c_str()),
+        1,
+        GL_FALSE,
+        &m[0][0]
+    );
 }
 
 void Shader::setInt(const std::string& n, int v) const {
     glUniform1i(glGetUniformLocation(ID, n.c_str()), v);
-    
+}
+
+void Shader::setVec3(const std::string& n, float x, float y, float z) const {
+    glUniform3f(glGetUniformLocation(ID, n.c_str()), x, y, z);
 }
