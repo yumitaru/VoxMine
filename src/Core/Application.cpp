@@ -4,6 +4,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "../Input/Input.h"
 #include "../WorldGeneration/WorldManager.hpp"
@@ -12,14 +13,16 @@
 #include "../Graphics/Renderer.h"
 #include "../Graphics/HUDRenderer.h"
 #include "../Graphics/HandRenderer.h"
+#include "../Graphics/ChestRenderer.h"
 
-static WorldManager worldManager(16, 16, 16);
+static WorldManager worldManager(4, 4, 4);
 static Player player;
 static Camera camera({0.f, 0.f, 0.f});
 
 static Renderer renderer;
 static HUDRenderer hud;
 static HandRenderer hand;
+static ChestRenderer chestRenderer;
 
 static float lastFrame = 0.f;
 static bool mouseLeftWasDown = false;
@@ -62,6 +65,7 @@ void Application::Init() {
     renderer.Init();
     hud.Init();
     hand.Init();
+    chestRenderer.Init();
 
     camera.Position = glm::vec3(
         worldManager.getPlayerX() + 0.5f,
@@ -144,6 +148,30 @@ void Application::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderer.RenderWorld(worldManager.getWorld(), camera);
         renderer.RenderFallingBlocks(worldManager.getFallingBlocks(), camera);
+
+        renderer.RenderWorld(worldManager.getWorld(), camera);
+        renderer.RenderFallingBlocks(worldManager.getFallingBlocks(), camera);
+
+        glm::mat4 projection = glm::perspective(
+            glm::radians(60.f),
+            1280.f / 720.f,
+            0.1f,
+            100.f
+        );
+
+        for (int x = 0; x < worldManager.getWorld().getSizeX(); x++)
+        for (int y = 0; y < worldManager.getWorld().getSizeY(); y++)
+        for (int z = 0; z < worldManager.getWorld().getSizeZ(); z++)
+        {
+            if (worldManager.getWorld().getBlock(x,y,z) == TREASURE)
+            {
+                chestRenderer.Render(
+                    glm::vec3(x + 0.5f, y, z + 0.5f),
+                    camera.GetViewMatrix(),
+                    projection
+                );
+            }
+        }
 
         if (gameWon) 
         {

@@ -37,6 +37,20 @@ FetchContent_Declare(
     GIT_TAG        v0.1.36
 )
 
+FetchContent_Declare(
+    assimp
+    GIT_REPOSITORY https://github.com/assimp/assimp.git
+    GIT_TAG        v5.3.1
+)
+
+# Assimp options – wyłączamy rzeczy których nie potrzebujesz
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(assimp)
+
 # Konfiguracja GLAD
 set(GLAD_PROFILE "core")
 set(GLAD_API "gl=3.3")     # możesz zmienić np. na gl=3.3
@@ -56,6 +70,8 @@ add_executable(${PROJECT_NAME}
     src/Graphics/Shader.cpp
     src/Graphics/Renderer.cpp
     src/Graphics/HUDRenderer.cpp
+    src/Graphics/ChestRenderer.cpp
+    src/Graphics/Model.cpp
     src/World/Floor.cpp
     src/WorldGeneration/World.cpp
     src/WorldGeneration/RandomIntGen.cpp
@@ -64,10 +80,6 @@ add_executable(${PROJECT_NAME}
     src/Input/Input.cpp
     src/Graphics/HandRenderer.cpp
     src/Player/Player.cpp
-    shaders/vertex.vs
-    shaders/fragment.fs
-    shaders/hand.fs
-    shaders/hand.vs
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -81,6 +93,7 @@ target_link_libraries(${PROJECT_NAME}
         glfw
         glm::glm
         glad
+        assimp
 )
 
 # if (MSVC)

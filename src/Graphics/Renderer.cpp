@@ -59,8 +59,8 @@ void Renderer::Init() {
         "../../shaders/vertex.vs",
         "../../shaders/fragment.fs"
     );
-    stoneTex = LoadTexture("./Textures/stone.png");
-    mossTex  = LoadTexture("./Textures/moss.png");
+    stoneTex = LoadTexture("../../src/Textures/stone.png");
+    mossTex  = LoadTexture("../../src/Textures/moss.png");
 
 float cubeVertices[] = {
     0,0,1,  0,0,1,  0,0,
@@ -195,7 +195,8 @@ void Renderer::RenderWorld(World& world, const Camera& camera) {
                 {
                     case DIRT:     layerY = y;    break;
                     case STONE:    layerY = -1;   break;
-                    case TREASURE: layerY = 999;  break;
+                    case TREASURE:
+                            continue;
                     default:       continue;
                 }
 
