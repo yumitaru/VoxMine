@@ -12,6 +12,10 @@ uniform int layerY;
 
 uniform sampler2D texStone;
 uniform sampler2D texMoss;
+uniform sampler2D texDirt;
+uniform sampler2D texGrass;
+
+
 
 float edgeFactorQuad(vec2 uv)
 {
@@ -25,9 +29,27 @@ void main()
 {
     vec3 baseColor;
 
+    vec3 N = normalize(vNormal);
+
     if (layerY >= 1 && layerY <= 16)
     {
-        baseColor = vec3(0.2, 1.0, 0.2);
+
+        vec3 dirt = texture(texDirt, vFaceUV).rgb;
+        vec3 grass = texture(texGrass, vFaceUV).rgb;
+        
+        if (N.y > 0.9)
+        {
+            baseColor = grass;
+        }
+        else if (N.y < -0.9)
+        {
+            baseColor = dirt;
+        }
+        else
+        {
+            float blend = smoothstep(0.6, 0.9, vFaceUV.y);
+            baseColor = mix(dirt, grass, blend);
+        }
     }
     else
     {
@@ -38,7 +60,7 @@ void main()
         baseColor = mix(stone, moss, mossFactor);
     }
 
-    vec3 N = normalize(vNormal);
+    
     vec3 L = normalize(-lightDir);
 
     float diff = max(dot(N, L), 0.0);

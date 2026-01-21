@@ -25,4 +25,6 @@ private:
 
     unsigned int stoneTex = 0;
     unsigned int mossTex  = 0;
+    unsigned int dirtTex  = 0;
+    unsigned int grassTex = 0;
 };

@@ -61,6 +61,8 @@ void Renderer::Init() {
     );
     stoneTex = LoadTexture("../../src/Textures/stone.png");
     mossTex  = LoadTexture("../../src/Textures/moss.png");
+    dirtTex  = LoadTexture("../../src/Textures/dirt.png");
+    grassTex = LoadTexture("../../src/Textures/grass.png");
 
 float cubeVertices[] = {
     0,0,1,  0,0,1,  0,0,
@@ -160,6 +162,16 @@ void Renderer::RenderWorld(World& world, const Camera& camera) {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, mossTex);
     shader->setInt("texMoss", 1);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, dirtTex);
+    shader->setInt("texDirt", 2);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, grassTex);
+    shader->setInt("texGrass", 3);
+
+
 
     glm::mat4 projection = glm::perspective(
         glm::radians(60.f),
