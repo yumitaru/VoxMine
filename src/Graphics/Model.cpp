@@ -117,7 +117,7 @@ Model::Model(const std::string& path)
                           (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    texture = LoadModelTexture("../../src/Textures/treasure-chest.png");
+    texture = LoadModelTexture("../../src/Textures/treasure-chest2.png");
 
     if (texture == 0)
         std::cout << "MODEL TEXTURE IS 0!\n";
