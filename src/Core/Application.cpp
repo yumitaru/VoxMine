@@ -149,8 +149,6 @@ void Application::Run() {
         renderer.RenderWorld(worldManager.getWorld(), camera);
         renderer.RenderFallingBlocks(worldManager.getFallingBlocks(), camera);
 
-        renderer.RenderWorld(worldManager.getWorld(), camera);
-        renderer.RenderFallingBlocks(worldManager.getFallingBlocks(), camera);
 
         glm::mat4 projection = glm::perspective(
             glm::radians(60.f),
@@ -199,7 +197,7 @@ void Application::ResetGame()
 {
     gameWon = false; 
 
-    worldManager.Reset(16, 16, 16); 
+    worldManager.Reset(4, 4, 4); 
 
     camera.Position = glm::vec3(
         worldManager.getPlayerX() + 0.5f,
